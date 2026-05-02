@@ -340,12 +340,12 @@
         {
           icon: '🚀',
           title: 'El producto está listo para escalar',
-          text: 'El producto está estable, validado en producción, con tráfico real. Lo que falta ahora es la mano que construye las próximas integraciones críticas (POS, delivery, pagos) para que el escalamiento sea posible sin romper lo que ya funciona.'
+          text: 'Nos encontramos en la etapa de integración: necesitamos conectar la plataforma con sistemas POS, proveedores de delivery y gateways de pago. Esa capa es la que destraba el escalamiento de 100 a 500 locales.'
         },
         {
           icon: '👥',
           title: 'El equipo',
-          text: 'Equipo chico, decisiones rápidas, sin burocracia. Cada persona tiene contexto completo del negocio y autonomía real. CTO Leandro Rebequi conduce las entrevistas y va a ser tu interlocutor técnico directo.'
+          text: 'No buscamos a alguien que ejecute tickets ni que solo cumpla la tarea asignada. Buscamos a una persona que se haga cargo de estos módulos de punta a punta y entregue trabajo del que se sienta orgulloso. CTO Leandro Rebequi conduce las entrevistas y va a ser tu interlocutor técnico directo.'
         },
       ];
 
@@ -435,13 +435,12 @@
     function ElRol() {
       const ref = useRef(null);
       useRevealOnScroll(ref, '.reveal', 80);
-      const [activeTab, setActiveTab] = useState(0);
 
       const bloques = [
         {
           emoji: '🧩',
-          title: 'Capa de Integraciones POS',
-          desc: 'Implementar adaptadores en un microservicio unificado para los POS más usados del mercado argentino.',
+          title: 'Capa 1: Integraciones POS',
+          desc: 'Microservicio unificado para los POS más usados de Argentina',
           providers: ['Fudo', 'Bistrosoft', 'Maxirest', 'Franquify'],
           tareas: [
             'Mapear estructuras de datos diferentes entre POS (menús, órdenes, pagos) a un modelo canónico Deenex',
@@ -452,8 +451,8 @@
         },
         {
           emoji: '🚚',
-          title: 'Capa de Integraciones Logísticas (Delivery)',
-          desc: 'Integrar proveedores de delivery dentro del microservicio de orquestación con lógica de competencia en tiempo real.',
+          title: 'Capa 2: Integraciones Logísticas (Delivery)',
+          desc: 'Orquestación de proveedores de delivery con lógica de competencia en tiempo real',
           providers: ['PedidosYa', 'Rapiboy', 'Punni'],
           tareas: [
             'Implementar lógica de "race condition control" (locking, winner selection cuando varios providers responden)',
@@ -464,8 +463,8 @@
         },
         {
           emoji: '💳',
-          title: 'Capa de Microservicio de Pagos',
-          desc: 'Trabajo conjunto con otros devs del equipo, integrando proveedores de pago en un microservicio unificado.',
+          title: 'Capa 3: Microservicio de Pagos (en colab con el equipo)',
+          desc: 'Integración de proveedores de pago en un microservicio unificado',
           providers: ['Mercado Pago', 'MODO', 'Mobex'],
           tareas: [
             'Implementación de adaptadores de pago',
@@ -490,70 +489,78 @@
               <span className="italic font-medium text-primary">de punta a punta</span>
             </h2>
 
-            <p className="reveal text-ink-2 text-base leading-relaxed max-w-3xl mb-4 font-sans">
-              Te encargas de un <strong className="text-ink font-heading">pack de funcionalidades concretas</strong> que cubre 3 verticales backend + la capa frontend que las expone. <strong className="text-ink font-heading">USD 2.000 por el pack completo</strong>. No son 3 packs separados, es uno integral.
+            <p className="reveal text-ink-2 text-base leading-relaxed max-w-3xl mb-8 font-sans">
+              Te encargás de un <strong className="text-ink font-heading">pack de funcionalidades concretas</strong> que cubre 3 verticales backend + la capa frontend que las expone. <strong className="text-ink font-heading">USD 2.000 por el pack completo</strong>. No son 3 packs separados, es uno integral.
             </p>
 
-            <div className="reveal p-5 md:p-6 rounded-2xl bg-primary/[0.04] border border-primary/10 mb-8 max-w-3xl">
-              <p className="font-heading font-bold text-ink text-sm mb-2">Buscamos full-time? Aclaración importante:</p>
-              <p className="text-ink-2 text-sm leading-relaxed font-sans">
-                <strong className="text-ink font-heading">Esta primera oportunidad es por obra</strong>: un pack de USD 2.000 a entregar. Si la obra sale bien, escala a una <strong className="text-ink font-heading">relación full-time</strong> (con compensación senior LATAM en USD) o híbrido CABA si vivís cerca. La obra es la prueba mutua antes de comprometernos a algo más estable.
-              </p>
+            {/* Two intro cards side by side */}
+            <div className="reveal grid md:grid-cols-2 gap-5 mb-12">
+              <div className="p-5 md:p-6 rounded-2xl bg-primary/[0.04] border border-primary/10">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">📦</span>
+                  <p className="font-heading font-bold text-ink text-sm">¿Buscamos full-time?</p>
+                </div>
+                <p className="text-ink-2 text-sm leading-relaxed font-sans">
+                  <strong className="text-ink font-heading">Esta primera oportunidad es por obra</strong>: un pack de USD 2.000 a entregar. Si la obra sale bien, escala a una <strong className="text-ink font-heading">relación full-time</strong> (con compensación senior LATAM en USD) o híbrido CABA si vivís cerca. La obra es la prueba mutua antes de comprometernos a algo más estable.
+                </p>
+              </div>
+
+              <div className="p-5 md:p-6 rounded-2xl bg-white border border-border">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">🧩</span>
+                  <p className="font-heading font-bold text-ink text-sm">¿Qué es una "capa"?</p>
+                </div>
+                <p className="text-ink-2 text-sm leading-relaxed font-sans">
+                  Cada vertical es una <strong className="text-ink font-heading">capa de software independiente</strong> (un microservicio o módulo) que vive desacoplado de los demás, se comunica vía eventos asincrónicos y webhooks, y se puede escalar / desplegar / debuggear por separado. Esto es lo que te permite trabajar con autonomía en una capa sin romper las otras.
+                </p>
+              </div>
             </div>
 
-            <div className="reveal p-5 md:p-6 rounded-2xl bg-white border border-border mb-8 max-w-4xl">
-              <p className="font-heading font-bold text-ink text-sm mb-2">Lo que vas a construir: capas independientes</p>
-              <p className="text-ink-2 text-sm leading-relaxed font-sans">
-                Cada vertical es una <strong className="text-ink font-heading">capa de software independiente</strong> (un microservicio o modulo) que vive desacoplado de los demás, se comunica via eventos asincrónicos y webhooks, y se puede escalar / desplegar / debuggear por separado. Esto es lo que te permite trabajar con autonomía en una capa sin romper las otras.
-              </p>
+            {/* Visual divider — LO QUE VAS A CONSTRUIR */}
+            <div className="reveal flex items-center gap-4 mb-8">
+              <div className="flex-1 h-px bg-primary/15"></div>
+              <h3 className="font-heading font-extrabold text-primary text-sm tracking-wider uppercase whitespace-nowrap">Lo que vas a construir</h3>
+              <div className="flex-1 h-px bg-primary/15"></div>
             </div>
 
-            {/* Tab navigation for 3 blocks */}
-            <div className="reveal flex flex-wrap gap-2 mb-6">
+            {/* 3 capas — always visible, full-width */}
+            <div className="space-y-5">
               {bloques.map((b, i) => (
-                <button key={i} onClick={() => setActiveTab(i)}
-                  className={`px-5 py-3 rounded-xl font-heading font-semibold text-sm transition-all duration-300 ${activeTab === i ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white border border-border text-ink hover:bg-primary/5'}`}>
-                  {b.emoji} {b.title.split(' ').slice(0, 3).join(' ')}
-                </button>
-              ))}
-            </div>
-
-            {/* Active block content */}
-            <div className="reveal p-6 md:p-8 rounded-[28px] bg-white border border-border card-hover">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl">{bloques[activeTab].emoji}</span>
-                </div>
-                <div>
-                  <h3 className="font-heading font-bold text-ink text-xl tracking-tight">{bloques[activeTab].title}</h3>
-                  <p className="text-ink-2 text-sm font-sans">{bloques[activeTab].desc}</p>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-3">Providers a integrar</p>
-                  <div className="flex flex-wrap gap-2">
-                    {bloques[activeTab].providers.map((p, i) => (
-                      <span key={i} className="px-4 py-2 rounded-full bg-primary-surface text-ink font-heading font-semibold text-sm">{p}</span>
-                    ))}
+                <div key={i} className="reveal p-6 md:p-8 rounded-[28px] bg-white border border-border card-hover shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-3 mb-5">
+                    <span className="text-4xl flex-shrink-0">{b.emoji}</span>
+                    <div>
+                      <h3 className="font-heading font-bold text-ink text-xl tracking-tight">{b.title}</h3>
+                      <p className="text-ink-2 text-sm font-sans">{b.desc}</p>
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-3">Tareas técnicas</p>
-                  <div className="space-y-2">
-                    {bloques[activeTab].tareas.map((t, i) => (
-                      <div key={i} className="flex items-start gap-2.5">
-                        <span className="text-primary mt-0.5 flex-shrink-0">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        </span>
-                        <span className="text-ink-2 text-sm font-sans leading-relaxed">{t}</span>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="md:border-r md:border-border md:pr-6">
+                      <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-3">Providers</p>
+                      <div className="flex flex-wrap gap-2">
+                        {b.providers.map((p, j) => (
+                          <span key={j} className="px-4 py-2 rounded-full bg-primary-surface text-ink font-heading font-semibold text-sm">{p}</span>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+
+                    <div>
+                      <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-3">Tareas</p>
+                      <div className="space-y-2">
+                        {b.tareas.map((t, j) => (
+                          <div key={j} className="flex items-start gap-2.5">
+                            <span className="text-primary mt-0.5 flex-shrink-0">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            <span className="text-ink-2 text-sm font-sans leading-relaxed">{t}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -573,6 +580,7 @@
         { icon: '🔧', title: 'Production-first', desc: 'Te importa que el código corra bien con tráfico real, no solo que pase tests en local.' },
         { icon: '🗣️', title: 'Comunicación directa', desc: 'Decís lo que pensás, sin vueltas. Si algo no encaja, lo decís.' },
         { icon: '🏗️', title: 'Construir > mantener', desc: 'Preferís resolver cosas nuevas a hacer maintenance de legacy.' },
+        { icon: '⚡', title: 'Bias to action', desc: 'Antes que evaluar 10 opciones, prototipás la primera y vas iterando con feedback real. Velocidad > perfección.' },
       ];
 
       return (
@@ -698,12 +706,15 @@
               Marcá mentalmente cada checkbox. Si podés tildar <strong className="text-ink font-heading">TODOS los del bloque técnico + el excluyente de Claude Code</strong>, aplicá. Si dudás de varios, mejor esperá a tener más experiencia y aplicá en una próxima ronda.
             </p>
 
-            {/* Counter */}
-            <div className="reveal mb-8 inline-flex items-center gap-3 px-5 py-3 rounded-full bg-white border border-border">
-              <span className="font-heading font-bold text-primary text-lg">{totalChecked}</span>
-              <span className="text-ink-2 text-sm font-sans">de {totalItems} requisitos marcados</span>
-              <div className="w-24 h-2 rounded-full bg-primary/10 overflow-hidden">
-                <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${(totalChecked / totalItems) * 100}%` }}></div>
+            {/* Counter — full-width sticky */}
+            <div className="sticky top-[90px] z-30 bg-primary-surface/95 backdrop-blur py-4 mb-8 border-y border-border">
+              <div className="flex items-center gap-4 flex-wrap">
+                <span className="font-heading font-bold text-primary text-lg">{totalChecked}</span>
+                <span className="text-ink-2 text-sm font-sans">de {totalItems} requisitos marcados</span>
+                <div className="flex-1 min-w-[120px] h-2.5 rounded-full bg-primary/10 overflow-hidden">
+                  <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${(totalChecked / totalItems) * 100}%` }}></div>
+                </div>
+                <span className="text-ink-3 text-sm font-sans">{totalItems - totalChecked > 0 ? `Faltan ${totalItems - totalChecked}` : '¡Todos marcados!'}</span>
               </div>
             </div>
 
@@ -822,7 +833,7 @@
             <h2 className="reveal font-heading font-extrabold text-ink leading-[1.1] tracking-[-0.03em] mb-3"
                 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
               Contratación por obra.{' '}
-              <span className="italic font-medium text-primary">Directo al grano.</span>
+              <span className="italic font-medium text-primary">Reglas claras desde el día 1.</span>
             </h2>
             <p className="reveal text-ink-2 text-base leading-relaxed max-w-2xl mb-10 font-sans">
               Arrancamos con un pack de funcionalidades concretas. Si la obra funciona, escala a relación más estable con compensación senior LATAM.

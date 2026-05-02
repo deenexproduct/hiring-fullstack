@@ -6,7 +6,7 @@
   <title>Full-Stack Engineer — Pack de funcionalidades — Deenex</title>
   <meta name="description" content="Sumate a Deenex como Full-Stack Engineer. Un pack de funcionalidades concretas: POS + Delivery + Pagos + Frontend. USD 2.000 por el pack completo, 100% remoto." />
 
-  <!-- Open Graph — WhatsApp / LinkedIn / social sharing -->
+  <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Full-Stack Engineer — Pack de funcionalidades — Deenex" />
   <meta property="og:description" content="Un pack de funcionalidades concretas: POS + Delivery + Pagos + Frontend. React + Node.js + MongoDB + Redis. USD 2.000 por el pack, 100% remoto." />
@@ -26,7 +26,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235423E7'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.35em' font-family='sans-serif' font-size='20' font-weight='bold' fill='white'%3ED%3C/text%3E%3C/svg%3E" />
 
-  <!-- Fonts: DM Sans + Inter (Deenex brand) -->
+  <!-- Fonts: DM Sans + Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500;1,9..40,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -71,9 +71,7 @@
     ::-webkit-scrollbar-thumb { background: #5423E7; border-radius: 999px; }
 
     @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.4); } }
-    @keyframes scroll-hint { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(8px); opacity: 1; } }
 
-    /* Hero entrance — CSS animation (works even in background tabs) */
     @keyframes hero-fade-up {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
@@ -89,14 +87,12 @@
     .hero-el:nth-child(5) { animation-delay: 0.78s; }
     .hero-el:nth-child(6) { animation-delay: 0.9s; }
 
-    /* Scroll reveal classes — IntersectionObserver driven */
-    .opp-r, .mani-r, .role-r, .prof-r, .req-r, .comp-r, .off-r, .fq-r, .proc-r, .app-r {
+    .reveal {
       opacity: 0;
       transform: translateY(30px);
       transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
     }
-    .opp-r.is-visible, .mani-r.is-visible, .role-r.is-visible, .prof-r.is-visible, .req-r.is-visible,
-    .comp-r.is-visible, .off-r.is-visible, .fq-r.is-visible, .proc-r.is-visible, .app-r.is-visible {
+    .reveal.is-visible {
       opacity: 1;
       transform: translateY(0);
     }
@@ -127,15 +123,29 @@
       box-shadow: 0 20px 60px -15px rgba(84,35,231,0.12);
     }
 
+    .checkbox-custom {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 2px solid #E8E3FF; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+      flex-shrink: 0;
+    }
+    .checkbox-custom.checked {
+      background: #5423E7; border-color: #5423E7;
+    }
+    .checkbox-custom.checked svg { opacity: 1; }
+    .checkbox-custom svg { opacity: 0; transition: opacity 0.2s ease; }
+
+    .checkbox-critical { border-color: #5423E7; border-width: 3px; }
+    .checkbox-critical.checked { background: #5423E7; border-color: #5423E7; }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+    const { useState, useEffect, useRef, useCallback } = React;
 
-    /* Deenex Logo SVG — white fill variant */
     const DeenexLogoWhite = ({ className = '' }) => (
       <svg viewBox="0 0 692 138" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
         <path d="M307.497 99.8052H228.728V40.7717H307.497V54.5347H246.299V64.3159H305.852V75.6551H246.299V86.0422H307.497V99.8052ZM394.732 99.8052H315.963V40.7717H394.732V54.5347H333.535V64.3159H393.088V75.6551H333.535V86.0422H394.732V99.8052ZM420.771 99.8052H403.199V40.7717H423.281L474.005 80.6756V40.7717H491.576V99.8052H471.927L420.771 59.2089V99.8052ZM579.685 99.8052H500.916V40.7717H579.685V54.5347H518.488V64.3159H578.041V75.6551H518.488V86.0422H579.685V99.8052ZM586.161 40.7717H612.562L637.231 61.0266L662.074 40.7717H687.435L651.081 70.2019L687.782 99.8052H661.121L636.885 79.81L612.215 99.8052H586.075L622.862 70.4616L586.161 40.7717Z" fill="white"/>
@@ -151,7 +161,6 @@
       </svg>
     );
 
-    /* Deenex Logo — dark/primary fill variant */
     const DeenexLogoDark = ({ className = '' }) => (
       <svg viewBox="0 0 692 138" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
         <path d="M307.497 99.8052H228.728V40.7717H307.497V54.5347H246.299V64.3159H305.852V75.6551H246.299V86.0422H307.497V99.8052ZM394.732 99.8052H315.963V40.7717H394.732V54.5347H333.535V64.3159H393.088V75.6551H333.535V86.0422H394.732V99.8052ZM420.771 99.8052H403.199V40.7717H423.281L474.005 80.6756V40.7717H491.576V99.8052H471.927L420.771 59.2089V99.8052ZM579.685 99.8052H500.916V40.7717H579.685V54.5347H518.488V64.3159H578.041V75.6551H518.488V86.0422H579.685V99.8052ZM586.161 40.7717H612.562L637.231 61.0266L662.074 40.7717H687.435L651.081 70.2019L687.782 99.8052H661.121L636.885 79.81L612.215 99.8052H586.075L622.862 70.4616L586.161 40.7717Z" fill="#121217"/>
@@ -167,66 +176,10 @@
       </svg>
     );
 
-    /* ============================================================
-       NAVBAR — Purple pill, Deenex style
-    ============================================================ */
-    function Navbar() {
-      const [scrolled, setScrolled] = useState(false);
-      const [menuOpen, setMenuOpen] = useState(false);
+    const CheckIcon = () => (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    );
 
-      useEffect(() => {
-        const h = () => setScrolled(window.scrollY > 60);
-        window.addEventListener('scroll', h, { passive: true });
-        return () => window.removeEventListener('scroll', h);
-      }, []);
-
-      return (
-        <nav className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-6xl transition-all duration-500 ease-out" style={{ borderRadius: '60px' }}>
-          <div className={`px-5 py-3 md:px-8 md:py-3.5 flex items-center justify-between transition-all duration-500 ${scrolled ? 'bg-white/80 backdrop-blur-xl border border-primary/10 shadow-lg shadow-primary/5' : 'bg-primary border border-primary'}`}
-               style={{ borderRadius: '60px' }}>
-            {scrolled
-              ? <DeenexLogoDark className="h-5 md:h-6 w-auto" />
-              : <DeenexLogoWhite className="h-5 md:h-6 w-auto" />
-            }
-
-            <div className="hidden md:flex items-center gap-6">
-              {['Quiénes somos', 'La oportunidad', 'El rol', 'Compensación'].map((label, i) => (
-                <a key={i} href={`#${['deenex','oportunidad','rol','compensacion'][i]}`}
-                   className={`text-sm font-medium transition-colors duration-300 ${scrolled ? 'text-ink/70 hover:text-primary' : 'text-white/80 hover:text-white'}`}>
-                  {label}
-                </a>
-              ))}
-              <a href="#aplicar" className={`btn-primary px-5 py-2.5 text-sm font-semibold rounded-lg ${scrolled ? 'bg-primary text-white' : 'bg-white text-primary'}`}>
-                Quiero aplicar
-              </a>
-            </div>
-
-            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2" aria-label="Menu">
-              <div className="flex flex-col gap-1.5">
-                {[0,1,2].map(i => (
-                  <span key={i} className={`block w-5 h-0.5 transition-all duration-300 ${scrolled ? 'bg-ink' : 'bg-white'} ${menuOpen && i === 0 ? 'rotate-45 translate-y-2' : ''} ${menuOpen && i === 1 ? 'opacity-0' : ''} ${menuOpen && i === 2 ? '-rotate-45 -translate-y-2' : ''}`}></span>
-                ))}
-              </div>
-            </button>
-          </div>
-
-          {menuOpen && (
-            <div className="md:hidden mt-2 bg-white/95 backdrop-blur-xl border border-primary/10 shadow-xl p-6 flex flex-col gap-4" style={{ borderRadius: '20px' }}>
-              <a href="#deenex" onClick={() => setMenuOpen(false)} className="text-ink font-heading font-medium">Quiénes somos</a>
-              <a href="#oportunidad" onClick={() => setMenuOpen(false)} className="text-ink font-heading font-medium">La oportunidad</a>
-              <a href="#rol" onClick={() => setMenuOpen(false)} className="text-ink font-heading font-medium">El rol</a>
-              <a href="#compensacion" onClick={() => setMenuOpen(false)} className="text-ink font-heading font-medium">Compensación</a>
-              <a href="#aplicar" onClick={() => setMenuOpen(false)} className="btn-primary text-center px-5 py-3 bg-primary text-white font-semibold rounded-lg mt-2">Quiero aplicar</a>
-            </div>
-          )}
-        </nav>
-      );
-    }
-
-    /* ============================================================
-       HERO
-    ============================================================ */
-    /* Shared hook: reveal elements when scrolled into view */
     function useRevealOnScroll(ref, selector, staggerMs = 80) {
       useEffect(() => {
         if (!ref.current) return;
@@ -248,27 +201,86 @@
       }, []);
     }
 
-    function Hero() {
-      const ref = useRef(null);
+    /* ============================================================
+       NAVBAR — Sticky con anchor links
+    ============================================================ */
+    function Navbar() {
+      const [scrolled, setScrolled] = useState(false);
+      const [menuOpen, setMenuOpen] = useState(false);
+
+      useEffect(() => {
+        const h = () => setScrolled(window.scrollY > 60);
+        window.addEventListener('scroll', h, { passive: true });
+        return () => window.removeEventListener('scroll', h);
+      }, []);
+
+      const navLinks = [
+        { label: 'Quienes somos', href: '#quienes-somos' },
+        { label: 'La oportunidad', href: '#oportunidad' },
+        { label: 'El rol', href: '#rol' },
+        { label: 'Requisitos', href: '#requisitos' },
+      ];
 
       return (
-        <section ref={ref} className="relative min-h-[100dvh] flex flex-col justify-center pt-28 pb-16 px-5 md:px-10 overflow-hidden" id="hero">
-          {/* Purple gradient background */}
-          <div className="absolute inset-0 bg-primary"></div>
+        <nav className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-6xl transition-all duration-500 ease-out" style={{ borderRadius: '60px' }}>
+          <div className={`px-5 py-3 md:px-8 md:py-3.5 flex items-center justify-between transition-all duration-500 ${scrolled ? 'bg-white/80 backdrop-blur-xl border border-primary/10 shadow-lg shadow-primary/5' : 'bg-primary border border-primary'}`}
+               style={{ borderRadius: '60px' }}>
+            {scrolled
+              ? <DeenexLogoDark className="h-5 md:h-6 w-auto" />
+              : <DeenexLogoWhite className="h-5 md:h-6 w-auto" />
+            }
+
+            <div className="hidden md:flex items-center gap-6">
+              {navLinks.map((link, i) => (
+                <a key={i} href={link.href}
+                   className={`text-sm font-medium transition-colors duration-300 ${scrolled ? 'text-ink/70 hover:text-primary' : 'text-white/80 hover:text-white'}`}>
+                  {link.label}
+                </a>
+              ))}
+              <a href="#aplicar" className={`btn-primary px-5 py-2.5 text-sm font-semibold rounded-lg ${scrolled ? 'bg-primary text-white' : 'bg-white text-primary'}`}>
+                Aplicar
+              </a>
+            </div>
+
+            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2" aria-label="Menu">
+              <div className="flex flex-col gap-1.5">
+                {[0,1,2].map(i => (
+                  <span key={i} className={`block w-5 h-0.5 transition-all duration-300 ${scrolled ? 'bg-ink' : 'bg-white'} ${menuOpen && i === 0 ? 'rotate-45 translate-y-2' : ''} ${menuOpen && i === 1 ? 'opacity-0' : ''} ${menuOpen && i === 2 ? '-rotate-45 -translate-y-2' : ''}`}></span>
+                ))}
+              </div>
+            </button>
+          </div>
+
+          {menuOpen && (
+            <div className="md:hidden mt-2 bg-white/95 backdrop-blur-xl border border-primary/10 shadow-xl p-6 flex flex-col gap-4" style={{ borderRadius: '20px' }}>
+              {navLinks.map((link, i) => (
+                <a key={i} href={link.href} onClick={() => setMenuOpen(false)} className="text-ink font-heading font-medium">{link.label}</a>
+              ))}
+              <a href="#aplicar" onClick={() => setMenuOpen(false)} className="btn-primary text-center px-5 py-3 bg-primary text-white font-semibold rounded-lg mt-2">Aplicar</a>
+            </div>
+          )}
+        </nav>
+      );
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    function Hero() {
+      return (
+        <section className="relative min-h-[100dvh] flex flex-col justify-center pt-28 pb-16 px-5 md:px-10 overflow-hidden" id="hero">
           <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #5423E7 0%, #3a15b0 40%, #2a0f8a 100%)' }}></div>
           <div className="absolute bottom-0 left-0 right-0 h-32" style={{ background: 'linear-gradient(to top, #F0EDFF, transparent)' }}></div>
-
-          {/* Subtle grid pattern */}
           <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
 
           <div className="relative z-10 max-w-6xl mx-auto w-full text-center">
             <div className="hero-el inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 border border-white/15 mb-8">
               <span className="w-2 h-2 rounded-full bg-green-400" style={{ animation: 'pulse-dot 2s infinite' }}></span>
-              <span className="text-white/80 text-xs font-mono font-medium tracking-wider uppercase">Posición abierta</span>
+              <span className="text-white/80 text-xs font-mono font-medium tracking-wider uppercase">Posicion abierta</span>
             </div>
 
             <div className="hero-el mb-4">
-              <span className="text-white/50 text-sm md:text-base font-sans tracking-[0.25em] uppercase">—— Deenex ——</span>
+              <span className="text-white/50 text-sm md:text-base font-sans tracking-[0.25em] uppercase">-- Deenex --</span>
             </div>
 
             <h1 className="hero-el font-heading text-white leading-[0.95] tracking-[-0.05em] mb-8 text-4xl md:text-6xl lg:text-7xl" style={{ fontWeight: 800 }}>
@@ -276,21 +288,21 @@
               <span className="italic" style={{ color: '#c4b5fd', fontWeight: 500 }}>Engineer</span>
             </h1>
 
-            <p className="hero-el text-white/60 text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-3 font-sans">
-              Pack de funcionalidades — POS + Delivery + Pagos + Frontend
+            <p className="hero-el text-white/70 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-3 font-heading font-semibold">
+              Pack de funcionalidades -- POS + Delivery + Pagos
             </p>
 
             <p className="hero-el text-white/40 text-sm md:text-base leading-relaxed max-w-2xl mx-auto mb-10 font-sans">
-              Te encargás de un pack concreto de funcionalidades para escalar la plataforma de 100 a 500 cadenas gastronómicas en LATAM. USD 2.000 por el pack completo. Todo lo descrito acá.
+              Construimos la plataforma para 100+ cadenas gastronomicas en LATAM. Vamos por las proximas 400.
             </p>
 
             <div className="hero-el flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <a href="#aplicar" className="btn-primary inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-white text-primary font-heading font-bold text-base rounded-lg shadow-xl shadow-black/20">
-                Quiero aplicar
+                Aplicar ahora
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </a>
-              <a href="#oportunidad" className="btn-outline inline-flex items-center justify-center gap-2 px-8 py-4 text-white/80 font-heading font-semibold text-base rounded-lg border border-white/20">
-                Conocer más
+              <a href="#quienes-somos" className="btn-outline inline-flex items-center justify-center gap-2 px-8 py-4 text-white/80 font-heading font-semibold text-base rounded-lg border border-white/20">
+                Conocer mas
               </a>
             </div>
 
@@ -298,7 +310,7 @@
               {[
                 { val: 'USD 2.000', sub: 'Pack completo' },
                 { val: '100% Remoto', sub: 'CABA/GBA preferente' },
-                { val: 'Full-Stack', sub: 'React · Node · MongoDB · Redis' },
+                { val: 'Full-Stack', sub: 'React + Node + MongoDB + Redis' },
               ].map((m, i) => (
                 <div key={i} className="text-center">
                   <p className="font-heading font-extrabold text-white text-xl md:text-2xl tracking-tight">{m.val}</p>
@@ -312,135 +324,54 @@
     }
 
     /* ============================================================
-       ABOUT DEENEX — Who we are
+       QUIENES SOMOS — 3 sub-bloques
     ============================================================ */
-    function AboutDeenex() {
+    function QuienesSomos() {
       const ref = useRef(null);
+      useRevealOnScroll(ref, '.reveal', 100);
+
+      const bloques = [
+        {
+          icon: '🏢',
+          title: 'La marca',
+          text: 'Deenex es la plataforma tecnologica para cadenas gastronomicas. Hoy trabajamos con 100+ locales (Somos Palta, La Fabrica, QUEM, Monti, Coquitos) y este anio vamos de 200 a 500.'
+        },
+        {
+          icon: '🚀',
+          title: 'El producto esta listo para escalar',
+          text: 'El producto esta estable, validado en produccion, con trafico real. Lo que falta ahora es la mano que construye las proximas integraciones criticas -- POS, delivery, pagos -- para que el escalamiento sea posible sin romper lo que ya funciona.'
+        },
+        {
+          icon: '👥',
+          title: 'El equipo',
+          text: 'Equipo chico, decisiones rapidas, sin burocracia. Cada persona tiene contexto completo del negocio y autonomia real. CTO Leandro Rebequi conduce las entrevistas y va a ser tu interlocutor tecnico directo.'
+        },
+      ];
 
       return (
-        <section ref={ref} id="deenex" className="py-20 md:py-28 px-5 md:px-10">
+        <section ref={ref} id="quienes-somos" className="py-20 md:py-28 px-5 md:px-10">
           <div className="max-w-6xl mx-auto">
-            {/* Section badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
-              <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">Quiénes somos</span>
+            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
+              <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">Quienes somos</span>
             </div>
 
-            {/* Headline + intro */}
-            <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start mb-16">
-              <div>
-                <h2 className="font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-5"
-                    style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)' }}>
-                  Deenex integra ventas, fidelización y{' '}
-                  <span className="italic font-medium text-primary">tecnología</span>{' '}
-                  en una sola plataforma
-                </h2>
-                <p className="text-ink-2 text-base leading-relaxed font-sans">
-                  Somos una plataforma SaaS B2B que permite a las marcas de venta de productos de consumo masivo lanzar su propio canal de venta digital, capturar datos de sus clientes, fidelizarlos y comunicarse de forma directa y fácil. No vendemos "una app" — vendemos un sistema para transformar ventas en base de datos propia y esa base en recurrencia y rentabilidad.
-                </p>
-              </div>
+            <h2 className="reveal font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-10"
+                style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)' }}>
+              Deenex integra ventas, fidelizacion y{' '}
+              <span className="italic font-medium text-primary">tecnologia</span>{' '}
+              en una sola plataforma
+            </h2>
 
-              {/* The Deenex Loop */}
-              <div className="p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
-                <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-4">El loop Deenex</p>
-                <div className="space-y-3">
-                  {[
-                    { step: '01', label: 'Canal propio de ventas', desc: 'Web app de marca, omnicanal: salón, takeaway, delivery' },
-                    { step: '02', label: 'Captura de datos', desc: 'Cada comprador se convierte en usuario registrado' },
-                    { step: '03', label: 'Puntos y fidelización', desc: 'Recompensas, beneficios, promos, cumpleaños' },
-                    { step: '04', label: 'Segmentación y campañas', desc: 'Push, WhatsApp, banners personalizados por comportamiento' },
-                    { step: '05', label: 'Más recurrencia', desc: 'Cada ciclo genera más datos, más recompra, más rentabilidad' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <span className="font-mono text-xs font-bold text-primary/40 mt-0.5 flex-shrink-0">{item.step}</span>
-                      <div>
-                        <p className="font-heading font-bold text-ink text-sm leading-tight">{item.label}</p>
-                        <p className="text-ink-2 text-xs font-sans leading-relaxed">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Traction metrics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-              {[
-                { val: '200+', label: 'Puntos de venta activos' },
-                { val: '300K+', label: 'Usuarios en la plataforma' },
-                { val: '5+', label: 'Marcas grandes y reconocidas' },
-                { val: 'Feb 2026', label: 'Producto listo para distribuir desde' },
-              ].map((m, i) => (
-                <div key={i} className="p-5 rounded-2xl bg-white border border-border text-center card-hover">
-                  <p className="font-heading font-extrabold text-primary text-2xl md:text-3xl tracking-tight mb-1">{m.val}</p>
-                  <p className="text-ink-2 text-xs font-sans">{m.label}</p>
+            <div className="grid md:grid-cols-3 gap-5">
+              {bloques.map((b, i) => (
+                <div key={i} className="reveal p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
+                  <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center mb-4">
+                    <span className="text-xl">{b.icon}</span>
+                  </div>
+                  <h3 className="font-heading font-bold text-ink text-lg mb-3 tracking-tight">{b.title}</h3>
+                  <p className="text-ink-2 text-sm leading-relaxed font-sans">{b.text}</p>
                 </div>
               ))}
-            </div>
-
-            {/* Clients strip */}
-            <div className="mb-14">
-              <p className="text-center text-ink-3 text-xs font-mono tracking-wider uppercase mb-5">Marcas líderes ya usan Deenex</p>
-              <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-                {['Somos Palta', 'La Fábrica', 'QUEM', 'Monti', 'Coquitos', 'Glorias', 'Emplatame', 'La UTE'].map((name, i) => (
-                  <div key={i} className="px-5 py-2.5 rounded-full bg-white border border-border text-ink font-heading font-semibold text-sm">
-                    {name}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Stage + Team */}
-            <div className="grid md:grid-cols-2 gap-5">
-              {/* Current stage */}
-              <div className="p-6 md:p-7 rounded-[28px] bg-primary/[0.04] border border-primary/10 card-hover">
-                <div className="flex items-center gap-2.5 mb-4">
-                  <span className="w-2 h-2 rounded-full bg-green-500" style={{ animation: 'pulse-dot 2s infinite' }}></span>
-                  <span className="font-mono text-primary/60 text-xs tracking-wider uppercase">Etapa actual</span>
-                </div>
-                <h3 className="font-heading font-bold text-ink text-lg mb-3 tracking-tight">Producto estable. Listo para escalar.</h3>
-                <p className="text-ink-2 text-sm leading-relaxed font-sans mb-4">
-                  Tenemos producto funcionando desde febrero 2026, clientes con múltiples sucursales reconocidos en el mercado gastronómico argentino, y un plan claro de expansión regional.
-                </p>
-                <div className="space-y-2">
-                  {[
-                    'Producto estable y en evolución constante',
-                    'Clientes activos con muchas sucursales',
-                    'Modelo de negocio validado por suscripción',
-                    'Expansión: Argentina → Brasil → México',
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <span className="text-primary mt-0.5 flex-shrink-0">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      </span>
-                      <span className="text-ink-2 text-sm font-sans">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Team */}
-              <div className="p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
-                <p className="font-mono text-ink-3 text-xs tracking-wider uppercase mb-4">El equipo fundador</p>
-                <p className="text-ink-2 text-sm leading-relaxed font-sans mb-5">
-                  Somos un equipo chico, enfocado y con mucha ambición. Cada persona tiene impacto directo en lo que construimos.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { name: 'Alan Tapia', role: 'Cofundador', area: 'Comercial, ventas, expansión' },
-                    { name: 'Joaquín Lombardi', role: 'Cofundador', area: 'Estrategia, producto, ops' },
-                    { name: 'Thainá', role: 'Operaciones', area: 'Coordinación, procesos' },
-                    { name: 'Leandro', role: 'CTO', area: 'Tecnología, arquitectura, producto' },
-                    { name: 'Agustín', role: 'Desarrollo', area: 'Producto, features' },
-                    { name: 'Santiago', role: 'Desarrollo', area: 'Sistema, soporte técnico' },
-                  ].map((person, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-primary-surface">
-                      <p className="font-heading font-bold text-ink text-sm leading-tight">{person.name}</p>
-                      <p className="text-primary text-xs font-medium">{person.role}</p>
-                      <p className="text-ink-3 text-[11px] font-sans mt-0.5">{person.area}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -448,48 +379,49 @@
     }
 
     /* ============================================================
-       OPPORTUNITY
+       LA OPORTUNIDAD — texto principal + 3 cards
     ============================================================ */
-    function Opportunity() {
+    function LaOportunidad() {
       const ref = useRef(null);
-      useRevealOnScroll(ref, '.opp-r', 100);
+      useRevealOnScroll(ref, '.reveal', 100);
 
       return (
         <section ref={ref} id="oportunidad" className="py-20 md:py-28 px-5 md:px-10">
           <div className="max-w-6xl mx-auto">
-            <div className="opp-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
+            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
               <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">La oportunidad</span>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
+            <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start mb-12">
               <div>
-                <h2 className="opp-r font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-5"
+                <h2 className="reveal font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-5"
                     style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)' }}>
-                  No buscamos a alguien para{' '}
-                  <span className="italic font-medium text-primary">"armar CRUDs."</span>
+                  No buscamos a alguien para que{' '}
+                  <span className="italic font-medium text-primary">ejecute tickets.</span>
                 </h2>
-                <p className="opp-r text-ink-2 text-base leading-relaxed font-sans">
-                  Buscamos a alguien que lleve un pack de funcionalidades de punta a punta: desde el backend de integraciones (POS, delivery, pagos) hasta la capa frontend que las expone. Sistemas distribuidos reales, no CRUDs.
+              </div>
+
+              <div>
+                <p className="reveal text-ink-2 text-base leading-relaxed font-sans">
+                  Buscamos a quien quiere construir algo que va a tener <strong className="text-ink font-heading">repercusion real en la operacion de cientos de locales gastronomicos en produccion</strong>. Cada integracion que armas va a procesar transacciones reales, gestionar deliveries reales, mover dinero real. Si te motiva ver tu codigo corriendo en algo que mueve un negocio fisico todos los dias, esto es para vos.
                 </p>
               </div>
+            </div>
 
-              <div className="space-y-4">
-                {[
-                  { icon: '✓', title: 'Producto en producción con tráfico real', desc: 'Cadenas grandes como Somos Palta, QUEM, Monti ya corren sobre Deenex. No es un MVP — es un sistema que procesa órdenes reales todos los días.' },
-                  { icon: '↗', title: 'De 200 a 500 locales este año', desc: 'Para escalar necesitamos integrar más POS, más proveedores de delivery y más gateways de pago. Ahí entrás vos.' },
-                  { icon: '◎', title: 'Trabajo directo con el CTO', desc: 'Leandro Rebequi (CTO) lidera la arquitectura. Trabajás codo a codo con él y el equipo de desarrollo, sin capas intermedias.' },
-                ].map((card, i) => (
-                  <div key={i} className="opp-r p-6 rounded-2xl bg-white border border-border card-hover">
-                    <div className="flex items-start gap-4">
-                      <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm">{card.icon}</div>
-                      <div>
-                        <h3 className="font-heading font-bold text-ink text-[15px] mb-1">{card.title}</h3>
-                        <p className="text-ink-2 text-sm leading-relaxed font-sans">{card.desc}</p>
-                      </div>
-                    </div>
+            <div className="grid md:grid-cols-3 gap-5">
+              {[
+                { emoji: '🚀', title: 'Impacto desde semana 1', desc: 'Codigo en produccion con trafico real desde el dia 1. Nada de sandbox ni MVPs internos.' },
+                { emoji: '🏗️', title: 'Construir, no mantener', desc: 'Funcionalidades nuevas, no maintenance de legacy. Integraciones que no existen todavia.' },
+                { emoji: '📈', title: 'Escalada futura', desc: 'Si la obra funciona, full-time / hibrido CABA con compensacion senior LATAM en USD.' },
+              ].map((card, i) => (
+                <div key={i} className="reveal p-6 rounded-2xl bg-white border border-border card-hover">
+                  <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center mb-4">
+                    <span className="text-xl">{card.emoji}</span>
                   </div>
-                ))}
-              </div>
+                  <h3 className="font-heading font-bold text-ink text-[15px] mb-2">{card.title}</h3>
+                  <p className="text-ink-2 text-sm leading-relaxed font-sans">{card.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -497,100 +429,129 @@
     }
 
     /* ============================================================
-       CONTEXT / MANIFESTO — Dark section
+       EL ROL — Explicacion de capas + 3 bloques verticales
     ============================================================ */
-    function Manifesto() {
+    function ElRol() {
       const ref = useRef(null);
-      useRevealOnScroll(ref, '.mani-r', 120);
+      useRevealOnScroll(ref, '.reveal', 80);
+      const [activeTab, setActiveTab] = useState(0);
 
-      return (
-        <section ref={ref} className="mx-4 md:mx-8 rounded-[32px] bg-primary py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-
-          <div className="relative z-10 max-w-4xl mx-auto text-center">
-            <div className="mani-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 mb-8">
-              <span className="text-white/80 text-xs font-mono font-medium tracking-wider uppercase">El contexto</span>
-            </div>
-
-            <h2 className="mani-r font-heading font-extrabold text-white leading-[1.1] tracking-[-0.03em] mb-6"
-                style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)' }}>
-              En LATAM, millones de negocios{' '}
-              <span className="italic font-medium" style={{ color: '#e0d4ff' }}>alquilan sus clientes</span>{' '}
-              a agregadores que cobran hasta 35% de comisión.
-            </h2>
-
-            <div className="mani-r w-12 h-0.5 bg-white/20 mx-auto mb-6"></div>
-
-            <p className="mani-r text-white/60 text-base leading-relaxed max-w-2xl mx-auto mb-10 font-sans">
-              Deenex construye el sistema que permite vender directo, sin comisiones, y transformar cada compra en recurrencia. Activamos bases de clientes con WhatsApp y Push.
-            </p>
-
-            <div className="mani-r grid sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
-              <div className="p-6 rounded-2xl text-left bg-white/[0.08] border border-white/[0.12]">
-                <p className="font-mono text-white/40 text-xs mb-2 tracking-wider uppercase">Status quo</p>
-                <p className="font-heading font-bold text-white/70 text-base leading-snug">Comisiones del 12-35%.<br/>Clientes que no son tuyos.<br/>Datos que nunca ves.</p>
-              </div>
-              <div className="p-6 rounded-2xl text-left bg-white/15 border border-white/20">
-                <p className="font-mono text-white/80 text-xs mb-2 tracking-wider uppercase">Con Deenex</p>
-                <p className="font-heading font-bold text-white text-base leading-snug">Canal propio, sin comisión.<br/>Base de datos propia.<br/>Recurrencia activada.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      );
-    }
-
-    /* ============================================================
-       THE ROLE
-    ============================================================ */
-    function TheRole() {
-      const ref = useRef(null);
-      useRevealOnScroll(ref, '.role-r', 80);
-
-      const areas = [
-        { area: 'Integraciones POS', items: ['Adaptadores para Fudo, Bistrosoft, Maxirest, Franquify', 'Mapeo de estructuras (menús, órdenes, pagos) a modelo canónico', 'Webhooks seguros con HMAC y validación de payload'] },
-        { area: 'Integraciones Delivery', items: ['PedidosYa, Rapiboy, Punni', 'Lógica de competencia en tiempo real (race condition control)', 'Dispatch sessions con estados distribuidos'] },
-        { area: 'Microservicio de Pagos', items: ['Mercado Pago, MODO, Mobex', 'Normalización de estados cross-provider', 'Idempotencia y prevención de duplicados'] },
-        { area: 'Capa Frontend', items: ['Endpoints REST para dashboard (estados de POS, delivery, pagos)', 'Componentes React con estados en tiempo real', 'Integración con el design system Deenex existente'] },
-        { area: 'Arquitectura async', items: ['Colas con BullMQ + Redis', 'Retry con backoff exponencial, circuit breaker', 'Adapter, Strategy — sistemas desacoplados y resilientes'] },
-        { area: 'Stack completo', items: ['React + TypeScript + Tailwind (frontend)', 'Node.js (NestJS o Express) + MongoDB + Redis', 'GitHub + CI/CD + Claude Code (IA en el flujo)'] },
+      const bloques = [
+        {
+          emoji: '🧩',
+          title: 'Capa de Integraciones POS',
+          desc: 'Implementar adaptadores en un microservicio unificado para los POS mas usados del mercado argentino.',
+          providers: ['Fudo', 'Bistrosoft', 'Maxirest', 'Franquify'],
+          tareas: [
+            'Mapear estructuras de datos diferentes entre POS (menus, ordenes, pagos) a un modelo canonico Deenex',
+            'Disenar flujos asincronicos (colas, retries, idempotencia)',
+            'Integrar webhooks seguros (HMAC, validaciones de payload)',
+            'Trabajar con arquitectura orientada a eventos',
+          ],
+        },
+        {
+          emoji: '🚚',
+          title: 'Capa de Integraciones Logisticas (Delivery)',
+          desc: 'Integrar proveedores de delivery dentro del microservicio de orquestacion con logica de competencia en tiempo real.',
+          providers: ['PedidosYa', 'Rapiboy', 'Punni'],
+          tareas: [
+            'Implementar logica de "race condition control" (locking, winner selection cuando varios providers responden)',
+            'Disenar sistemas asincronicos con webhooks',
+            'Manejar estados distribuidos (dispatch sessions)',
+            'Implementar cancelaciones diferidas y retry logic',
+          ],
+        },
+        {
+          emoji: '💳',
+          title: 'Capa de Microservicio de Pagos',
+          desc: 'Trabajo conjunto con otros devs del equipo, integrando proveedores de pago en un microservicio unificado.',
+          providers: ['Mercado Pago', 'MODO', 'Mobex'],
+          tareas: [
+            'Implementacion de adaptadores de pago',
+            'Normalizacion de estados de transacciones (cross-provider)',
+            'Manejo de webhooks y confirmaciones asincronicas',
+            'Estrategias de idempotencia y prevencion de duplicados',
+            'Diseno de flujos tolerantes a fallos',
+          ],
+        },
       ];
 
       return (
         <section ref={ref} id="rol" className="py-20 md:py-28 px-5 md:px-10">
           <div className="max-w-6xl mx-auto">
-            <div className="role-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
+            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
               <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">El rol</span>
             </div>
 
-            <div className="grid md:grid-cols-5 gap-8 md:gap-14 mb-14">
-              <div className="md:col-span-2">
-                <h2 className="role-r font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-4" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
-                  Un pack completo.{' '}
-                  <span className="italic font-medium text-primary">De punta a punta.</span>
-                </h2>
-                <p className="role-r text-ink-2 text-sm leading-relaxed font-sans">
-                  POS + Delivery + Pagos + capa Frontend. Integrás proveedores en una arquitectura de adaptadores y conectás todo con la UI de Deenex. Cada proveedor es distinto, las APIs no son perfectas, y los edge cases son reales. USD 2.000 cubre todo lo descrito acá.
-                </p>
+            <h2 className="reveal font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-4"
+                style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)' }}>
+              El rol -- Pack completo{' '}
+              <span className="italic font-medium text-primary">de punta a punta</span>
+            </h2>
+
+            <p className="reveal text-ink-2 text-base leading-relaxed max-w-3xl mb-4 font-sans">
+              Te encargas de un <strong className="text-ink font-heading">pack de funcionalidades concretas</strong> que cubre 3 verticales backend + la capa frontend que las expone. <strong className="text-ink font-heading">USD 2.000 por el pack completo</strong> -- no son 3 packs separados, es uno integral.
+            </p>
+
+            <div className="reveal p-5 md:p-6 rounded-2xl bg-primary/[0.04] border border-primary/10 mb-8 max-w-3xl">
+              <p className="font-heading font-bold text-ink text-sm mb-2">Buscamos full-time? Aclaracion importante:</p>
+              <p className="text-ink-2 text-sm leading-relaxed font-sans">
+                <strong className="text-ink font-heading">Esta primera oportunidad es por obra</strong> -- un pack de USD 2.000 a entregar. Si la obra sale bien, escala a una <strong className="text-ink font-heading">relacion full-time</strong> (con compensacion senior LATAM en USD) o hibrido CABA si vivis cerca. La obra es la prueba mutua antes de comprometernos a algo mas estable.
+              </p>
+            </div>
+
+            <div className="reveal p-5 md:p-6 rounded-2xl bg-white border border-border mb-8 max-w-4xl">
+              <p className="font-heading font-bold text-ink text-sm mb-2">Lo que vas a construir -- capas independientes</p>
+              <p className="text-ink-2 text-sm leading-relaxed font-sans">
+                Cada vertical es una <strong className="text-ink font-heading">capa de software independiente</strong> (un microservicio o modulo) que vive desacoplado de los demas, se comunica via eventos asincronicos y webhooks, y se puede escalar / desplegar / debuggear por separado. Esto es lo que te permite trabajar con autonomia en una capa sin romper las otras.
+              </p>
+            </div>
+
+            {/* Tab navigation for 3 blocks */}
+            <div className="reveal flex flex-wrap gap-2 mb-6">
+              {bloques.map((b, i) => (
+                <button key={i} onClick={() => setActiveTab(i)}
+                  className={`px-5 py-3 rounded-xl font-heading font-semibold text-sm transition-all duration-300 ${activeTab === i ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white border border-border text-ink hover:bg-primary/5'}`}>
+                  {b.emoji} {b.title.split(' ').slice(0, 3).join(' ')}
+                </button>
+              ))}
+            </div>
+
+            {/* Active block content */}
+            <div className="reveal p-6 md:p-8 rounded-[28px] bg-white border border-border card-hover">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">{bloques[activeTab].emoji}</span>
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-ink text-lg tracking-tight">{bloques[activeTab].title}</h3>
+                  <p className="text-ink-2 text-sm font-sans">{bloques[activeTab].desc}</p>
+                </div>
               </div>
 
-              <div className="md:col-span-3 grid sm:grid-cols-2 gap-4">
-                {areas.map((a, i) => (
-                  <div key={i} className="role-r p-5 rounded-2xl bg-white border border-border card-hover">
-                    <h3 className="font-heading font-bold text-ink text-sm mb-2.5 flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
-                      {a.area}
-                    </h3>
-                    <ul className="space-y-1">
-                      {a.items.map((item, j) => (
-                        <li key={j} className="text-ink-2 text-xs leading-relaxed font-sans flex items-start gap-2">
-                          <span className="text-ink-3 mt-0.5">—</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-3">Providers a integrar</p>
+                  <div className="flex flex-wrap gap-2">
+                    {bloques[activeTab].providers.map((p, i) => (
+                      <span key={i} className="px-4 py-2 rounded-full bg-primary-surface text-ink font-heading font-semibold text-sm">{p}</span>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                <div>
+                  <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-3">Tareas tecnicas</p>
+                  <div className="space-y-2">
+                    {bloques[activeTab].tareas.map((t, i) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <span className="text-primary mt-0.5 flex-shrink-0">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </span>
+                        <span className="text-ink-2 text-sm font-sans leading-relaxed">{t}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -599,50 +560,51 @@
     }
 
     /* ============================================================
-       PROFILE — Who we're looking for
+       MENTALIDAD — Builder mindset
     ============================================================ */
-    function Profile() {
+    function Mentalidad() {
       const ref = useRef(null);
-      useRevealOnScroll(ref, '.prof-r', 100);
+      useRevealOnScroll(ref, '.reveal', 120);
+
+      const items = [
+        { icon: '🎯', title: 'Foco en problemas, no en tickets', desc: 'Entendes el "por que" del problema antes de codear.' },
+        { icon: '🚀', title: 'Velocidad de decision', desc: 'Propones rapido, iteras rapido, erras rapido y aprendes.' },
+        { icon: '🔧', title: 'Production-first', desc: 'Te importa que el codigo corra bien con trafico real, no solo que pase tests en local.' },
+        { icon: '🗣️', title: 'Comunicacion directa', desc: 'Decis lo que pensas, sin vueltas. Si algo no encaja, lo decis.' },
+        { icon: '🏗️', title: 'Construir > mantener', desc: 'Preferis resolver cosas nuevas a hacer maintenance de legacy.' },
+      ];
 
       return (
-        <section ref={ref} className="mx-4 md:mx-8 rounded-[32px] bg-primary py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)', backgroundSize: '28px 28px' }}></div>
+        <section ref={ref} id="mentalidad" className="mx-4 md:mx-8 rounded-[32px] bg-primary py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
 
           <div className="relative z-10 max-w-5xl mx-auto">
-            <div className="prof-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 mb-6">
-              <span className="text-white/70 text-xs font-mono font-medium tracking-wider uppercase">A quién buscamos</span>
+            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 mb-6">
+              <span className="text-white/80 text-xs font-mono font-medium tracking-wider uppercase">Mentalidad</span>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-10 md:gap-16">
-              <div>
-                <h2 className="prof-r font-heading font-extrabold text-white leading-[1.1] tracking-[-0.03em] mb-5" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
-                  Mentalidad de{' '}
-                  <span className="italic font-medium" style={{ color: '#c4b5fd' }}>builder.</span>
-                </h2>
-                <p className="prof-r text-white/60 text-base leading-relaxed font-sans mb-5">
-                  No buscamos alguien que "hace lo que le piden". Buscamos alguien que ve el problema, propone la solución y la ejecuta. Si en el trabajo anterior te la pasaste esperando instrucciones, este no es tu lugar.
-                </p>
-                <p className="prof-r text-white/35 text-sm leading-relaxed font-sans">
-                  Si en el anterior te ibas antes de que te pidieran porque ya habías resuelto lo que hacía falta, hablemos. Nos importa más la mentalidad que el CV perfecto.
-                </p>
-              </div>
+            <h2 className="reveal font-heading font-extrabold text-white leading-[1.1] tracking-[-0.03em] mb-6"
+                style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)' }}>
+              Buscamos a alguien que{' '}
+              <span className="italic font-medium" style={{ color: '#e0d4ff' }}>busca soluciones</span>
+            </h2>
 
-              <div className="space-y-3.5">
-                {[
-                  { label: 'Full-Stack real', desc: 'backend de integraciones + frontend React — no solo uno de los dos' },
-                  { label: 'Claude Code', desc: 'integrado a tu workflow diario: CLAUDE.md, hooks, MCPs (excluyente)' },
-                  { label: 'Integraciones', desc: 'APIs externas, webhooks, idempotencia, sistemas resilientes' },
-                  { label: 'Startup DNA', desc: 'autonomía, ritmo alto, decisiones rápidas sin burocracia' },
-                ].map((t, i) => (
-                  <div key={i} className="prof-r p-5 rounded-2xl bg-white/[0.07] border border-white/10 card-hover">
-                    <div className="flex items-center gap-4">
-                      <span className="font-heading font-extrabold text-white text-lg tracking-tight">{t.label}</span>
-                      <span className="text-white/50 text-sm font-sans">{t.desc}</span>
+            <p className="reveal text-white/60 text-base leading-relaxed max-w-3xl mb-10 font-sans">
+              El stack y los anios de experiencia los podemos verificar en 10 minutos. Lo que no se ensenia -- y lo que mas nos importa -- es la mentalidad de builder: que cuando ves un problema, no esperes que te digan que hacer. Lo investigas, propones una solucion, la ejecutas, y avisas cuando esta hecho. Si en el trabajo anterior te la pasaste esperando instrucciones, este no es tu lugar. Si en el anterior te ibas antes de que te pidieran porque ya habias resuelto lo que hacia falta, hablemos.
+            </p>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {items.map((item, i) => (
+                <div key={i} className="reveal p-5 rounded-2xl bg-white/[0.08] border border-white/[0.12] card-hover">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl flex-shrink-0">{item.icon}</span>
+                    <div>
+                      <h3 className="font-heading font-bold text-white text-[15px] mb-1">{item.title}</h3>
+                      <p className="text-white/50 text-sm leading-relaxed font-sans">{item.desc}</p>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -650,181 +612,192 @@
     }
 
     /* ============================================================
-       REQUIREMENTS — Requisitos para sumarte al equipo
+       REQUISITOS — Checkbox interactivo
     ============================================================ */
-    function Requirements() {
+    function Requisitos() {
       const ref = useRef(null);
-      useRevealOnScroll(ref, '.req-r', 80);
+      useRevealOnScroll(ref, '.reveal', 60);
 
-      const techStack = [
-        { label: '3+ años', desc: 'desarrollando aplicaciones web reales en producción' },
-        { label: 'Node.js', desc: '(NestJS o Express) — backend de producción' },
-        { label: 'TypeScript', desc: 'código tipado en serio, no any por todos lados' },
-        { label: 'MongoDB', desc: 'modelado real (schemas, índices, agregaciones), no solo CRUDs' },
-        { label: 'Redis', desc: 'cache + pub/sub, idealmente con BullMQ o similar para queues' },
-        { label: 'REST APIs + Webhooks', desc: 'diseño y consumo' },
-        { label: 'React + Tailwind CSS', desc: 'capa frontend cuando hace falta (full-stack real)' },
-        { label: 'Git + GitHub Actions / CI/CD', desc: 'flujo de deploy serio' },
+      const [checked, setChecked] = useState({});
+
+      const toggle = useCallback((id) => {
+        setChecked(prev => ({ ...prev, [id]: !prev[id] }));
+      }, []);
+
+      const tecnico = [
+        { id: 't1', text: 'Tengo 3+ anios desarrollando aplicaciones web en produccion' },
+        { id: 't2', text: 'Trabaje con Node.js (NestJS o Express) en proyectos reales' },
+        { id: 't3', text: 'Uso TypeScript en serio (no `any` por todos lados)' },
+        { id: 't4', text: 'Modele bases de datos en MongoDB con schemas, indices y agregaciones reales' },
+        { id: 't5', text: 'Trabaje con Redis para cache + pub/sub' },
+        { id: 't6', text: 'Implemente colas con BullMQ (o equivalente: Bull, RabbitMQ, etc.)' },
+        { id: 't7', text: 'Disenie y consumi REST APIs + Webhooks asincronicos' },
+        { id: 't8', text: 'Se moverme en React + TypeScript + Tailwind cuando hace falta capa frontend' },
+        { id: 't9', text: 'Tengo flujo Git + GitHub Actions / CI/CD seteado en proyectos propios' },
+        { id: 't10', text: 'Conozco patterns Adapter / Strategy / Circuit Breaker' },
+        { id: 't11', text: 'Trabaje con idempotencia y prevencion de duplicados en webhooks' },
+        { id: 't12', text: 'Maneje race conditions y locking distribuido en produccion' },
       ];
 
-      const patterns = [
-        { label: 'Adapter / Strategy / Circuit Breaker', desc: 'para integraciones de terceros' },
-        { label: 'Async processing real', desc: 'colas, retries con backoff, dead letter queues' },
-        { label: 'Idempotencia y prevención de duplicados', desc: 'webhooks confiables' },
-        { label: 'Race conditions y locking distribuido', desc: 'concurrencia en producción' },
-        { label: 'Event-driven architecture', desc: 'sistemas desacoplados' },
+      const mentalidadItems = [
+        { id: 'm1', text: 'Cuando veo un problema, no espero instrucciones -- investigo y propongo' },
+        { id: 'm2', text: 'Me adapto rapido a cambios de prioridad sin drama' },
+        { id: 'm3', text: 'Me importa que el codigo corra bien en produccion, no solo que pase tests' },
+        { id: 'm4', text: 'Comunico directo: si algo no encaja, lo digo' },
+        { id: 'm5', text: 'Prefiero construir cosas nuevas a hacer maintenance de legacy' },
       ];
+
+      const claudeCode = {
+        id: 'cc1',
+        text: 'Uso Claude Code (CLI / IDE extension de Anthropic) en mi flujo de desarrollo DIARIO',
+        detalles: [
+          'Tengo CLAUDE.md armado en mis proyectos',
+          'Configure hooks para mi workflow',
+          'Uso MCPs custom o de la lista oficial',
+          'Uso comandos slash habituales (/init, /compact, /model, /clear)',
+          'Idealmente tengo agents armados para tareas repetitivas',
+        ],
+      };
 
       const bonus = [
-        'Experiencia previa integrando un POS, gateway de pago o proveedor de delivery',
-        'PostgreSQL para casos donde Mongo no encaja',
-        'PWAs',
+        { id: 'b1', text: 'Integre algun POS (Fudo, Bistrosoft, Maxirest, Franquify u otro)' },
+        { id: 'b2', text: 'Integre un gateway de pago (Mercado Pago, MODO, Mobex u otro)' },
+        { id: 'b3', text: 'Integre un proveedor de delivery (PedidosYa, Rapiboy, Punni u otro)' },
+        { id: 'b4', text: 'Trabaje con PostgreSQL en casos donde Mongo no encajaba' },
+        { id: 'b5', text: 'Construi PWAs en produccion' },
       ];
 
-      const mindset = [
-        { label: 'Autonomía real:', desc: 'no esperás que te digan qué hacer. Ves el problema, proponés solución, ejecutás.' },
-        { label: 'Ritmo startup:', desc: 'sabés que las prioridades pueden cambiar y te adaptás rápido sin drama.' },
-        { label: 'Foco en producción:', desc: 'te importa que el código corra bien con tráfico real, no solo que pase los tests en local.' },
-        { label: 'Comunicación directa:', desc: 'decís lo que pensás, sin vueltas. Si algo no encaja, lo decís.' },
-        { label: 'Construir, no mantener:', desc: 'te gusta más resolver cosas nuevas que hacer maintenance de legacy.' },
-      ];
+      const allItems = [...tecnico, ...mentalidadItems, { id: claudeCode.id }, ...bonus];
+      const totalChecked = allItems.filter(item => checked[item.id]).length;
+      const totalItems = allItems.length;
 
-      const claudeCode = [
-        'CLAUDE.md armado en tus proyectos',
-        'Hooks configurados',
-        'MCPs custom o de la lista',
-        'Comandos slash habituales (/init, /compact, /model, etc.)',
-        'Idealmente agents armados para tareas repetitivas',
-      ];
+      const Checkbox = ({ id, text, critical }) => (
+        <div className="flex items-start gap-3 cursor-pointer group" onClick={() => toggle(id)}>
+          <div className={`checkbox-custom ${checked[id] ? 'checked' : ''} ${critical ? 'checkbox-critical' : ''} mt-0.5`}>
+            <CheckIcon />
+          </div>
+          <span className={`text-sm font-sans leading-relaxed transition-colors ${checked[id] ? 'text-ink' : 'text-ink-2'}`}>{text}</span>
+        </div>
+      );
 
       return (
         <section ref={ref} id="requisitos" className="py-20 md:py-28 px-5 md:px-10">
           <div className="max-w-6xl mx-auto">
-            <div className="req-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
+            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
               <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">Requisitos</span>
             </div>
 
-            <h2 className="req-r font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-3" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
-              Requisitos para sumarte{' '}
-              <span className="italic font-medium text-primary">al equipo</span>
+            <h2 className="reveal font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-3"
+                style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)' }}>
+              Requisitos --{' '}
+              <span className="italic font-medium text-primary">Tenes todo esto?</span>
             </h2>
-            <p className="req-r text-ink-2 text-base leading-relaxed max-w-3xl mb-10 font-sans">
-              Para que esta colaboración funcione bien desde el día 1, necesitamos que cumplas con estos puntos. <strong className="text-ink font-heading">Si los cumplís todos, podés aplicar y avanzamos a la entrevista con Leandro (CTO).</strong>
+
+            <p className="reveal text-ink-2 text-base leading-relaxed max-w-3xl mb-10 font-sans">
+              Marca mentalmente cada checkbox. Si podes tildar <strong className="text-ink font-heading">TODOS los del bloque tecnico + el excluyente de Claude Code</strong>, aplica. Si dudas de varios, mejor espera a tener mas experiencia y aplica en una proxima ronda.
             </p>
 
-            <div className="grid md:grid-cols-3 gap-5 mb-8">
-              {/* Bloque 1 — Técnico */}
-              <div className="req-r md:col-span-2 p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
+            {/* Counter */}
+            <div className="reveal mb-8 inline-flex items-center gap-3 px-5 py-3 rounded-full bg-white border border-border">
+              <span className="font-heading font-bold text-primary text-lg">{totalChecked}</span>
+              <span className="text-ink-2 text-sm font-sans">de {totalItems} requisitos marcados</span>
+              <div className="w-24 h-2 rounded-full bg-primary/10 overflow-hidden">
+                <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${(totalChecked / totalItems) * 100}%` }}></div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-5">
+              {/* Bloque Tecnico */}
+              <div className="reveal md:col-span-2 p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
                 <div className="flex items-center gap-2.5 mb-5">
                   <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
                     <span className="text-base">🛠️</span>
                   </div>
                   <div>
-                    <p className="font-heading font-bold text-ink text-base">Bloque 1 — Técnico</p>
+                    <p className="font-heading font-bold text-ink text-base">Bloque Tecnico</p>
                     <p className="text-ink-3 text-xs font-sans">Stack y experiencia profesional</p>
                   </div>
                 </div>
-
-                <div className="space-y-2 mb-5">
-                  {techStack.map((t, i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <span className="text-primary mt-0.5 flex-shrink-0">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      </span>
-                      <p className="text-ink-2 text-sm font-sans leading-relaxed"><strong className="text-ink font-heading">{t.label}</strong> — {t.desc}</p>
-                    </div>
+                <div className="space-y-3">
+                  {tecnico.map((item) => (
+                    <Checkbox key={item.id} id={item.id} text={item.text} />
                   ))}
-                </div>
-
-                <p className="font-heading font-bold text-ink text-sm mb-3">Patterns y arquitectura que tenés que conocer</p>
-                <div className="space-y-2 mb-5">
-                  {patterns.map((p, i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <span className="text-primary mt-0.5 flex-shrink-0">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      </span>
-                      <p className="text-ink-2 text-sm font-sans leading-relaxed"><strong className="text-ink font-heading">{p.label}</strong> — {p.desc}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="p-4 rounded-xl bg-primary-surface">
-                  <p className="font-heading font-bold text-ink text-xs mb-2">Bonus (no excluyentes pero suman)</p>
-                  <div className="space-y-1.5">
-                    {bonus.map((b, i) => (
-                      <div key={i} className="flex items-start gap-2">
-                        <span className="text-primary/40 mt-0.5 text-xs">+</span>
-                        <p className="text-ink-2 text-xs font-sans leading-relaxed">{b}</p>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
 
-              {/* Bloques 2 y 3 — columna derecha */}
+              {/* Columna derecha: Mentalidad + Excluyente + Bonus */}
               <div className="space-y-5">
-                {/* Bloque 2 — Mentalidad */}
-                <div className="req-r p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
+                {/* Mentalidad */}
+                <div className="reveal p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
                   <div className="flex items-center gap-2.5 mb-4">
                     <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
                       <span className="text-base">🧠</span>
                     </div>
-                    <p className="font-heading font-bold text-ink text-base">Bloque 2 — Mentalidad</p>
+                    <p className="font-heading font-bold text-ink text-base">Mentalidad</p>
                   </div>
-
                   <div className="space-y-3">
-                    {mindset.map((m, i) => (
-                      <div key={i} className="flex items-start gap-2.5">
-                        <span className="text-ink-3 mt-0.5 flex-shrink-0">—</span>
-                        <p className="text-ink-2 text-sm font-sans leading-relaxed"><strong className="text-ink font-heading">{m.label}</strong> {m.desc}</p>
-                      </div>
+                    {mentalidadItems.map((item) => (
+                      <Checkbox key={item.id} id={item.id} text={item.text} />
                     ))}
                   </div>
                 </div>
 
-                {/* Bloque 3 — Excluyente */}
-                <div className="req-r p-6 md:p-7 rounded-[28px] bg-primary text-white card-hover relative overflow-hidden">
+                {/* Excluyente Claude Code */}
+                <div className="reveal p-6 md:p-7 rounded-[28px] bg-primary text-white card-hover relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #ffffff, transparent)', transform: 'translate(30%, -30%)' }}></div>
                   <div className="relative z-10">
-                    <div className="flex items-center gap-2.5 mb-4">
+                    <div className="flex items-center gap-2.5 mb-2">
                       <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
                         <span className="text-base">🔒</span>
                       </div>
                       <div>
-                        <p className="font-heading font-bold text-white text-base">Bloque 3 — Excluyente</p>
-                        <p className="text-white/50 text-xs font-sans">NO negociable</p>
+                        <p className="font-heading font-bold text-white text-base">Excluyente</p>
+                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white/20 text-white uppercase tracking-wider">NO negociable</span>
                       </div>
                     </div>
 
-                    <p className="font-heading font-bold text-white text-sm mb-3 leading-snug">
-                      Usás Claude Code (de Anthropic) en tu flujo de desarrollo diario.
-                    </p>
-                    <p className="text-white/60 text-xs font-sans leading-relaxed mb-3">
-                      No Claude.ai web. No solo Cursor con la API. <strong className="text-white">Claude Code</strong> — el CLI / IDE extension de Anthropic — integrado a tu workflow real:
-                    </p>
-                    <div className="space-y-1.5 mb-4">
-                      {claudeCode.map((c, i) => (
+                    <div className="flex items-start gap-3 cursor-pointer group my-4" onClick={() => toggle(claudeCode.id)}>
+                      <div className={`checkbox-custom checkbox-critical ${checked[claudeCode.id] ? 'checked' : ''} mt-0.5`} style={{ borderColor: checked[claudeCode.id] ? '#5423E7' : 'white' }}>
+                        <CheckIcon />
+                      </div>
+                      <span className="text-sm font-heading font-bold text-white leading-relaxed">{claudeCode.text}</span>
+                    </div>
+
+                    <div className="space-y-1.5 ml-9">
+                      {claudeCode.detalles.map((d, i) => (
                         <div key={i} className="flex items-start gap-2">
                           <span className="text-white/40 mt-0.5 flex-shrink-0">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                           </span>
-                          <p className="text-white/70 text-xs font-sans leading-relaxed">{c}</p>
+                          <p className="text-white/60 text-xs font-sans leading-relaxed">{d}</p>
                         </div>
                       ))}
                     </div>
-                    <p className="text-white/40 text-[11px] font-sans leading-relaxed">
-                      Si solo lo probaste un par de veces para curiosear, no aplica. Si lo usás todos los días, hablamos.
+
+                    <p className="text-white/30 text-[11px] font-sans leading-relaxed mt-3 ml-9">
+                      Si solo lo probaste un par de veces para curiosear, no aplica. Si lo usas todos los dias, hablamos.
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Closing text */}
-            <div className="req-r p-5 md:p-6 rounded-2xl bg-primary/[0.04] border border-primary/10 text-center">
-              <p className="text-ink text-sm md:text-base leading-relaxed font-sans">
-                <strong className="font-heading">Si cumplís los 3 bloques</strong> (técnico + mentalidad + excluyente Claude Code), <strong className="font-heading text-primary">aplicá</strong>. Te respondemos en 24-48 hs hábiles. La entrevista la conduce directamente Leandro Rebequi (CTO Deenex), 30 min por Meet, en alguno de los slots disponibles.
-              </p>
+                {/* Bonus */}
+                <div className="reveal p-6 md:p-7 rounded-[28px] bg-primary/[0.04] border border-primary/10 card-hover">
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+                      <span className="text-base">⭐</span>
+                    </div>
+                    <div>
+                      <p className="font-heading font-bold text-ink text-base">Bonus</p>
+                      <p className="text-ink-3 text-xs font-sans">No excluyentes pero suman</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {bonus.map((item) => (
+                      <Checkbox key={item.id} id={item.id} text={item.text} />
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -832,241 +805,74 @@
     }
 
     /* ============================================================
-       COMPENSATION
+       COMPENSACION
     ============================================================ */
-    function Compensation() {
+    function Compensacion() {
       const ref = useRef(null);
-      useRevealOnScroll(ref, '.comp-r', 100);
+      useRevealOnScroll(ref, '.reveal', 100);
 
       return (
         <section ref={ref} id="compensacion" className="py-20 md:py-28 px-5 md:px-10">
           <div className="max-w-6xl mx-auto">
-            <div className="comp-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
-              <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">Compensación</span>
+            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
+              <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">Compensacion</span>
             </div>
 
-            <h2 className="comp-r font-heading font-extrabold text-ink leading-[1.1] tracking-[-0.03em] mb-3" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
-              Contratación por obra.{' '}
+            <h2 className="reveal font-heading font-extrabold text-ink leading-[1.1] tracking-[-0.03em] mb-3"
+                style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
+              Contratacion por obra.{' '}
               <span className="italic font-medium text-primary">Directo al grano.</span>
             </h2>
-            <p className="comp-r text-ink-2 text-base leading-relaxed max-w-2xl mb-10 font-sans">
-              Arrancamos con un pack de funcionalidades concretas. Si la obra funciona, escala a relación más estable con compensación senior LATAM.
+            <p className="reveal text-ink-2 text-base leading-relaxed max-w-2xl mb-10 font-sans">
+              Arrancamos con un pack de funcionalidades concretas. Si la obra funciona, escala a relacion mas estable con compensacion senior LATAM.
             </p>
 
-            <div className="grid md:grid-cols-3 gap-5">
-              {/* La Obra */}
-              <div className="comp-r p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
-                <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center mb-4">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5423E7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-                </div>
-                <p className="font-mono text-ink-3 text-xs tracking-wider uppercase mb-2">Primera obra</p>
-                <p className="font-heading font-extrabold text-ink text-2xl tracking-tight mb-0.5">USD 2.000</p>
-                <p className="text-ink-3 text-xs mb-3">por pack de funcionalidades</p>
-                <p className="text-ink-2 text-sm leading-relaxed font-sans">El pack completo: POS + Delivery + Pagos + capa Frontend. Todo lo descrito en esta landing, un solo presupuesto, entregables claros.</p>
-              </div>
-
-              {/* Modalidad */}
-              <div className="comp-r p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
-                <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center mb-4">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5423E7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
-                </div>
-                <p className="font-mono text-ink-3 text-xs tracking-wider uppercase mb-2">Modalidad</p>
-                <p className="font-heading font-extrabold text-ink text-2xl tracking-tight mb-0.5">100% Remoto</p>
-                <p className="text-ink-3 text-xs mb-3">CABA / GBA preferente</p>
-                <p className="text-ink-2 text-sm leading-relaxed font-sans mb-4">Trabajás desde donde quieras. Coordinación directa con Leandro (CTO) vía Slack, GitHub y calls cuando haga falta.</p>
-                <div className="space-y-2.5">
-                  {[
-                    { step: 'Stack', amount: 'React + Node.js + MongoDB + Redis', trigger: 'NestJS, BullMQ, Tailwind, Webhooks' },
-                    { step: 'Herramientas', amount: 'GitHub + CI/CD + Claude Code', trigger: 'IA integrada al flujo de desarrollo' },
-                  ].map((s, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-primary-surface">
-                      <p className="text-xs font-mono text-primary/50 mb-0.5">{s.step}</p>
-                      <p className="text-sm font-heading font-bold text-ink">{s.amount}</p>
-                      <p className="text-xs text-ink-2 font-sans">{s.trigger}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Si la obra funciona — highlighted */}
-              <div className="comp-r p-6 md:p-7 rounded-[28px] bg-primary text-white card-hover relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #ffffff, transparent)', transform: 'translate(30%, -30%)' }}></div>
-                <div className="relative z-10">
-                  <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center mb-4">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            {/* Table */}
+            <div className="reveal max-w-3xl mb-10">
+              <div className="rounded-[28px] bg-white border border-border overflow-hidden">
+                {[
+                  { label: 'Modalidad', value: 'Por obra' },
+                  { label: 'Pack', value: 'POS + Delivery + Pagos + capa Full-Stack (completo)' },
+                  { label: 'Presupuesto', value: 'USD 2.000 por el pack completo', highlight: true },
+                  { label: 'Trabajo', value: '100% remoto' },
+                  { label: 'Escalada', value: 'Si la obra funciona → full-time o hibrido CABA, compensacion senior LATAM en USD' },
+                ].map((row, i) => (
+                  <div key={i} className={`flex items-start gap-4 px-6 py-4 ${i < 4 ? 'border-b border-border' : ''}`}>
+                    <span className="font-heading font-bold text-ink text-sm w-32 flex-shrink-0">{row.label}</span>
+                    <span className={`text-sm font-sans leading-relaxed ${row.highlight ? 'text-primary font-heading font-bold text-base' : 'text-ink-2'}`}>{row.value}</span>
                   </div>
-                  <p className="font-mono text-white/50 text-xs tracking-wider uppercase mb-2">Si la obra funciona</p>
-                  <p className="font-heading font-extrabold text-white text-2xl tracking-tight mb-0.5">Relación estable</p>
-                  <p className="text-white/50 text-xs mb-2">full-time o híbrido CABA</p>
-                  <p className="text-white/70 text-sm mb-4 font-sans leading-relaxed">Si hay fit mutuo, la relación escala a algo más estable: full-time o híbrido, con compensación acorde a perfil senior LATAM.</p>
-
-                  <div className="space-y-0">
-                    {[
-                      ['Compensación', 'Senior LATAM en USD'],
-                      ['Modalidad', 'Full-time o híbrido CABA'],
-                      ['Impacto', 'Features en producción desde día 1'],
-                      ['Equipo', 'Chico, rápido, sin burocracia'],
-                    ].map(([label, val], i) => (
-                      <div key={i} className="flex justify-between items-center py-2 border-b border-white/[0.12] last:border-0">
-                        <span className="text-white/60 text-xs font-sans">{label}</span>
-                        <span className="font-mono text-xs font-medium text-white">{val}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-white/40 text-xs mt-3 font-sans leading-relaxed">La primera obra es la mejor forma de conocernos: vos ves cómo trabajamos, nosotros vemos cómo construís. Sin promesas vacías.</p>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Cómo funciona la obra */}
-            <div className="comp-r mt-10 mb-5">
+            {/* Path from obra to team */}
+            <div className="reveal">
               <div className="text-center mb-8">
-                <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-3">Cómo funciona</p>
+                <p className="font-mono text-primary/60 text-xs tracking-wider uppercase mb-3">Como funciona</p>
                 <h3 className="font-heading font-extrabold text-ink leading-[1.1] tracking-[-0.02em]" style={{ fontSize: 'clamp(1.3rem, 2.5vw, 1.8rem)' }}>
                   Un camino claro de{' '}
                   <span className="italic font-medium text-primary">obra a equipo</span>
                 </h3>
               </div>
 
-              <div className="space-y-4">
-                <div className="comp-r p-5 md:p-6 rounded-2xl bg-white border border-border">
-                  <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-heading font-bold text-primary">01</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-heading font-bold text-ink text-sm mb-1">Definimos el pack juntos</p>
-                      <p className="text-ink-2 text-xs font-sans leading-relaxed mb-2">Leandro (CTO) te presenta los 4 verticales (POS, delivery, pagos, frontend), discutimos el approach técnico y cerramos entregables y timeline. USD 2.000 por el pack completo.</p>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-surface">
-                        <span className="text-primary font-heading font-bold text-sm">USD 2.000</span>
-                        <span className="text-ink-3 text-[10px] font-sans">por el pack completo</span>
+              <div className="space-y-4 max-w-4xl mx-auto">
+                {[
+                  { step: '01', title: 'Definimos el pack juntos', desc: 'Leandro (CTO) te presenta los 3 verticales (POS, delivery, pagos), discutimos el approach tecnico y cerramos entregables y timeline. USD 2.000 por el pack completo.' },
+                  { step: '02', title: 'Construis el pack con soporte directo del CTO', desc: 'Trabajas 100% remoto. Backend de integraciones + capa frontend. Acceso directo a Leandro y al equipo de desarrollo. Trafico real desde dia 1.' },
+                  { step: '03', title: 'Si hay fit mutuo, la relacion escala', desc: 'La obra es la mejor forma de conocernos. Si funciona, pasamos a full-time o hibrido CABA, con compensacion senior LATAM en USD.' },
+                ].map((s, i) => (
+                  <div key={i} className="reveal p-5 md:p-6 rounded-2xl bg-white border border-border card-hover">
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-heading font-bold text-primary">{s.step}</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-heading font-bold text-ink text-sm mb-1">{s.title}</p>
+                        <p className="text-ink-2 text-xs font-sans leading-relaxed">{s.desc}</p>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="comp-r p-5 md:p-6 rounded-2xl bg-white border border-border">
-                  <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-heading font-bold text-primary">02</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-heading font-bold text-ink text-sm mb-1">Construís el pack con soporte directo del CTO</p>
-                      <p className="text-ink-2 text-xs font-sans leading-relaxed mb-2">Trabajás 100% remoto. Backend de integraciones + capa frontend. Acceso directo a Leandro y al equipo de desarrollo. Tráfico real desde día 1.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="comp-r p-5 md:p-6 rounded-2xl bg-white border border-border">
-                  <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-heading font-bold text-primary">03</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-heading font-bold text-ink text-sm mb-1">Si hay fit mutuo, la relación escala</p>
-                      <p className="text-ink-2 text-xs font-sans leading-relaxed mb-2">La obra es la mejor forma de conocernos. Si funciona, pasamos a full-time o híbrido CABA, con compensación senior LATAM en USD.</p>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-surface">
-                        <span className="text-primary font-heading font-bold text-sm">Senior LATAM</span>
-                        <span className="text-ink-3 text-[10px] font-sans">compensación post-obra</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Key clarifications */}
-              <div className="comp-r mt-6 p-5 md:p-6 rounded-2xl bg-primary/[0.03] border border-primary/8">
-                <p className="font-mono text-primary/50 text-xs tracking-wider uppercase mb-3">Preguntas frecuentes</p>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {[
-                    { q: '¿Qué incluye el pack?', a: 'Todo lo descrito acá: integraciones POS + Delivery + Pagos + capa Frontend. Un único pack por USD 2.000. No son packs separados.' },
-                    { q: '¿Es 100% remoto?', a: 'Sí. Para la obra no hay requisito presencial. CABA/GBA es preferente pero no excluyente.' },
-                    { q: '¿Qué pasa después de la obra?', a: 'Si hay fit, escalamos a relación estable (full-time o híbrido) con compensación senior LATAM.' },
-                    { q: '¿Claude Code es obligatorio?', a: 'Sí. No Claude.ai web, no solo Cursor — Claude Code CLI/IDE extension integrado a tu workflow real (CLAUDE.md, hooks, MCPs).' },
-                  ].map((item, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-white">
-                      <p className="font-heading font-bold text-ink text-xs mb-1">{item.q}</p>
-                      <p className="text-ink-2 text-[11px] font-sans leading-relaxed">{item.a}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-      );
-    }
-
-    /* ============================================================
-       WHAT WE OFFER
-    ============================================================ */
-    function WhatWeOffer() {
-      const ref = useRef(null);
-      useRevealOnScroll(ref, '.off-r', 80);
-
-      const offers = [
-        { title: 'Tráfico real desde día 1', desc: 'Las integraciones que construís procesan órdenes de cadenas grandes como Somos Palta, QUEM y Monti. Nada de sandbox.' },
-        { title: 'Trabajo directo con el CTO', desc: 'Leandro lidera la arquitectura del microservicio. Feedback técnico directo, sin intermediarios.' },
-        { title: 'Problemas técnicos reales', desc: 'Race conditions, webhooks asincrónicos, APIs mal documentadas, idempotencia + componentes React en tiempo real. No son CRUDs.' },
-        { title: 'Stack Full-Stack completo', desc: 'React + TypeScript + Tailwind (front) + Node.js + NestJS + MongoDB + Redis + BullMQ (back). Adapter, Strategy, Circuit Breaker.' },
-        { title: 'Equipo chico y rápido', desc: 'Sin capas de management. Decisiones técnicas rápidas, deploy frecuente, impacto visible.' },
-        { title: 'Camino a full-time', desc: 'La obra es la puerta de entrada. Si hay fit, la relación crece a compensación senior LATAM.' },
-      ];
-
-      return (
-        <section ref={ref} className="mx-4 md:mx-8 rounded-[32px] bg-primary py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)', backgroundSize: '28px 28px' }}></div>
-          <div className="relative z-10 max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <div className="off-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 mb-6">
-                <span className="text-white/70 text-xs font-mono font-medium tracking-wider uppercase">Qué ofrecemos</span>
-              </div>
-              <h2 className="off-r font-heading font-extrabold text-white leading-[1.1] tracking-[-0.03em]" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
-                Más que un proyecto. Una{' '}
-                <span className="italic font-medium" style={{ color: '#e0d4ff' }}>oportunidad real.</span>
-              </h2>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {offers.map((o, i) => (
-                <div key={i} className="off-r p-6 rounded-2xl bg-white/[0.08] border border-white/[0.12] card-hover">
-                  <div className="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center mb-3">
-                    <span className="text-xs font-heading font-bold text-white">0{i + 1}</span>
-                  </div>
-                  <h3 className="font-heading font-bold text-white text-[15px] mb-1.5">{o.title}</h3>
-                  <p className="text-white/50 text-sm leading-relaxed font-sans">{o.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      );
-    }
-
-    /* ============================================================
-       FOUNDER QUOTE — Trust builder
-    ============================================================ */
-    function FounderQuote() {
-      const ref = useRef(null);
-      useRevealOnScroll(ref, '.fq-r', 100);
-
-      return (
-        <section ref={ref} className="py-16 md:py-20 px-5 md:px-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="fq-r p-8 md:p-10 rounded-[28px] bg-white border border-border card-hover relative">
-              <svg className="absolute top-6 left-6 text-primary/10" width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C9.591 11.68 11 13.166 11 15c0 1.933-1.567 3.5-3.5 3.5-1.198 0-2.324-.581-2.917-1.179zM14.583 17.321C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C19.591 11.68 21 13.166 21 15c0 1.933-1.567 3.5-3.5 3.5-1.198 0-2.324-.581-2.917-1.179z"/></svg>
-              <p className="fq-r text-ink text-lg md:text-xl leading-relaxed font-heading font-medium italic mb-6 relative z-10">
-                "Necesitamos a alguien que se haga cargo de un pack completo: integraciones de POS, delivery y pagos en el backend, y la capa React que las expone al usuario. Si te copa llevar funcionalidades de punta a punta con autonomía real, hablemos."
-              </p>
-              <div className="fq-r flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="font-heading font-bold text-primary text-sm">LR</span>
-                </div>
-                <div className="text-left">
-                  <p className="font-heading font-bold text-ink text-sm">Leandro Rebequi</p>
-                  <p className="text-ink-3 text-xs font-sans">CTO, Deenex</p>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1075,84 +881,54 @@
     }
 
     /* ============================================================
-       HOW IT WORKS — Application process
+       COMO APLICAR
     ============================================================ */
-    function ProcessSection() {
+    function ComoAplicar() {
       const ref = useRef(null);
-      useRevealOnScroll(ref, '.proc-r', 100);
-
-      return (
-        <section ref={ref} className="py-16 md:py-20 px-5 md:px-10">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <div className="proc-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
-                <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">Cómo es el proceso</span>
-              </div>
-              <h2 className="proc-r font-heading font-extrabold text-ink leading-[1.1] tracking-[-0.03em]" style={{ fontSize: 'clamp(1.4rem, 2.5vw, 2rem)' }}>
-                De la aplicación a la{' '}
-                <span className="italic font-medium text-primary">incorporación</span>
-              </h2>
-            </div>
-
-            <div className="space-y-4">
-              {[
-                { step: '01', title: 'Mandá DM o email', desc: 'Escribile a Alan Tapia por LinkedIn o a rebequileandro@gmail.com mencionando: 1) Cómo usás Claude Code en tu flujo (CLAUDE.md, hooks, MCPs). 2) Tu portfolio o repo con Node.js + MongoDB + Redis. 3) ¿Integraste algún POS, delivery provider o gateway de pago? Contá el caso.', icon: '💬' },
-                { step: '02', title: 'Charla técnica con el CTO', desc: 'Una call de 30 min con Leandro Rebequi (CTO). Hablamos de tu experiencia con integraciones, sistemas distribuidos, y cómo manejás edge cases reales. Te presentamos la arquitectura y los verticales.', icon: '🧠' },
-                { step: '03', title: 'Definimos los verticales juntos', desc: 'Si hay fit, cerramos qué integraciones entran en el pack (POS, delivery y/o pagos), approach técnico, timeline y entregables.', icon: '👥' },
-                { step: '04', title: 'Arrancás el pack', desc: 'Acceso al repo, onboarding con el equipo. Backend de integraciones + capa frontend. Tráfico real de cadenas grandes desde la primera semana.', icon: '🤝' },
-              ].map((s, i) => (
-                <div key={i} className="proc-r p-5 md:p-6 rounded-2xl bg-white border border-border card-hover flex items-start gap-4">
-                  <div className="flex flex-col items-center flex-shrink-0">
-                    <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center mb-1">
-                      <span className="text-lg">{s.icon}</span>
-                    </div>
-                    <span className="font-mono text-primary/30 text-[10px] font-bold">{s.step}</span>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-heading font-bold text-ink text-sm mb-1.5">{s.title}</h3>
-                    <p className="text-ink-2 text-xs leading-relaxed font-sans">{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="proc-r mt-6 p-4 rounded-2xl bg-primary/[0.03] border border-primary/8 text-center">
-              <p className="text-ink-2 text-sm font-sans">
-                <strong className="text-ink font-heading">Entrevistas:</strong> Lunes 4 — Jueves 7 de mayo · 15:00 a 19:00 hs ARG · 30 min · Google Meet
-              </p>
-            </div>
-          </div>
-        </section>
-      );
-    }
-
-    /* ============================================================
-       APPLY CTA
-    ============================================================ */
-    function ApplySection() {
-      const ref = useRef(null);
-      useRevealOnScroll(ref, '.app-r', 100);
+      useRevealOnScroll(ref, '.reveal', 100);
 
       return (
         <section ref={ref} id="aplicar" className="py-20 md:py-28 px-5 md:px-10">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="app-r inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-primary/8 border border-primary/15 mb-8">
+            <div className="reveal inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-primary/8 border border-primary/15 mb-8">
               <span className="w-2 h-2 rounded-full bg-green-500" style={{ animation: 'pulse-dot 2s infinite' }}></span>
               <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">Aplicar ahora</span>
             </div>
 
-            <h2 className="app-r font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-5"
+            <h2 className="reveal font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-5"
                 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}>
-              Si te entusiasma construir{' '}
-              <span className="italic font-medium text-primary">algo grande,</span>{' '}
-              este rol es para vos.
+              Si marcaste todos los checkboxes,{' '}
+              <span className="italic font-medium text-primary">es tu momento.</span>
             </h2>
 
-            <p className="app-r text-ink-2 text-base leading-relaxed max-w-xl mx-auto mb-8 font-sans">
-              Mandá DM por LinkedIn a Alan Tapia o email a rebequileandro@gmail.com. Contanos cómo usás Claude Code, tu experiencia con integraciones y compartí tu portfolio. Sin CV formal — queremos ver lo que construiste.
+            <p className="reveal text-ink-2 text-base leading-relaxed max-w-xl mx-auto mb-4 font-sans">
+              Si tildaste <strong className="text-ink font-heading">TODOS los checkboxes del bloque tecnico + el excluyente de Claude Code</strong>, manda el siguiente mensaje:
             </p>
 
-            <div className="app-r flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="reveal p-6 rounded-2xl bg-white border border-border text-left mb-8 max-w-xl mx-auto">
+              <p className="font-heading font-bold text-ink text-sm mb-3">Manda DM por LinkedIn a Alan Tapia o email a rebequileandro@gmail.com con:</p>
+              <div className="space-y-2.5">
+                {[
+                  'Como usas Claude Code en tu flujo? (ejemplo concreto: CLAUDE.md, hooks, MCPs, comandos slash)',
+                  'Tu portfolio o repo publico con proyectos en Node.js + MongoDB + Redis + queues',
+                  'Integraste alguna vez un POS / gateway de pago / proveedor de delivery? Conta el caso',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <span className="font-heading font-bold text-primary text-sm mt-0.5">{i + 1}.</span>
+                    <p className="text-ink-2 text-sm font-sans leading-relaxed">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="reveal p-4 rounded-2xl bg-primary/[0.03] border border-primary/8 mb-8 max-w-xl mx-auto">
+              <p className="text-ink-2 text-sm font-sans">
+                <strong className="text-ink font-heading">Entrevistas:</strong> Lunes 4 -- Jueves 7 de mayo 2026 · 15:00 a 19:00 hs ARG · 30 min con Leandro Rebequi (CTO) · Google Meet
+              </p>
+              <p className="text-ink-3 text-xs font-sans mt-2">Te respondemos en 24-48 hs habiles.</p>
+            </div>
+
+            <div className="reveal flex flex-col sm:flex-row gap-4 justify-center">
               <a href="https://www.linkedin.com/in/alannaimtapia/"
                  target="_blank" rel="noopener noreferrer"
                  className="btn-primary inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-primary text-white font-heading font-bold text-base rounded-lg shadow-xl shadow-primary/20">
@@ -1160,7 +936,7 @@
                 Aplicar por LinkedIn
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </a>
-              <a href="mailto:rebequileandro@gmail.com?subject=Full-Stack Engineer Integraciones — Aplicación"
+              <a href="mailto:rebequileandro@gmail.com?subject=Full-Stack Engineer Integraciones — Aplicacion"
                  className="btn-outline inline-flex items-center justify-center gap-2.5 px-8 py-4 text-ink font-heading font-semibold text-base rounded-lg border-2 border-ink/10">
                 O escribinos por mail
               </a>
@@ -1182,8 +958,6 @@
               <div className="flex flex-wrap gap-6">
                 <a href="https://deenex.com" className="text-white/50 text-sm font-sans hover:text-white/80 transition-colors">deenex.com</a>
                 <a href="https://linkedin.com/company/deenex" className="text-white/50 text-sm font-sans hover:text-white/80 transition-colors">LinkedIn</a>
-                <a href="#" className="text-white/50 text-sm font-sans hover:text-white/80 transition-colors">Privacidad</a>
-                <a href="#" className="text-white/50 text-sm font-sans hover:text-white/80 transition-colors">Términos</a>
               </div>
             </div>
             <div className="border-t border-white/[0.1] pt-5 flex flex-col md:flex-row justify-between items-center gap-3">
@@ -1206,17 +980,13 @@
         <>
           <Navbar />
           <Hero />
-          <AboutDeenex />
-          <Opportunity />
-          <Manifesto />
-          <TheRole />
-          <Profile />
-          <Requirements />
-          <Compensation />
-          <WhatWeOffer />
-          <FounderQuote />
-          <ProcessSection />
-          <ApplySection />
+          <QuienesSomos />
+          <LaOportunidad />
+          <ElRol />
+          <Mentalidad />
+          <Requisitos />
+          <Compensacion />
+          <ComoAplicar />
           <Footer />
         </>
       );

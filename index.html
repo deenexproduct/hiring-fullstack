@@ -90,12 +90,12 @@
     .hero-el:nth-child(6) { animation-delay: 0.9s; }
 
     /* Scroll reveal classes — IntersectionObserver driven */
-    .opp-r, .mani-r, .role-r, .prof-r, .comp-r, .off-r, .fq-r, .proc-r, .app-r {
+    .opp-r, .mani-r, .role-r, .prof-r, .req-r, .comp-r, .off-r, .fq-r, .proc-r, .app-r {
       opacity: 0;
       transform: translateY(30px);
       transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
     }
-    .opp-r.is-visible, .mani-r.is-visible, .role-r.is-visible, .prof-r.is-visible,
+    .opp-r.is-visible, .mani-r.is-visible, .role-r.is-visible, .prof-r.is-visible, .req-r.is-visible,
     .comp-r.is-visible, .off-r.is-visible, .fq-r.is-visible, .proc-r.is-visible, .app-r.is-visible {
       opacity: 1;
       transform: translateY(0);
@@ -650,6 +650,188 @@
     }
 
     /* ============================================================
+       REQUIREMENTS — Requisitos para sumarte al equipo
+    ============================================================ */
+    function Requirements() {
+      const ref = useRef(null);
+      useRevealOnScroll(ref, '.req-r', 80);
+
+      const techStack = [
+        { label: '3+ años', desc: 'desarrollando aplicaciones web reales en producción' },
+        { label: 'Node.js', desc: '(NestJS o Express) — backend de producción' },
+        { label: 'TypeScript', desc: 'código tipado en serio, no any por todos lados' },
+        { label: 'MongoDB', desc: 'modelado real (schemas, índices, agregaciones), no solo CRUDs' },
+        { label: 'Redis', desc: 'cache + pub/sub, idealmente con BullMQ o similar para queues' },
+        { label: 'REST APIs + Webhooks', desc: 'diseño y consumo' },
+        { label: 'React + Tailwind CSS', desc: 'capa frontend cuando hace falta (full-stack real)' },
+        { label: 'Git + GitHub Actions / CI/CD', desc: 'flujo de deploy serio' },
+      ];
+
+      const patterns = [
+        { label: 'Adapter / Strategy / Circuit Breaker', desc: 'para integraciones de terceros' },
+        { label: 'Async processing real', desc: 'colas, retries con backoff, dead letter queues' },
+        { label: 'Idempotencia y prevención de duplicados', desc: 'webhooks confiables' },
+        { label: 'Race conditions y locking distribuido', desc: 'concurrencia en producción' },
+        { label: 'Event-driven architecture', desc: 'sistemas desacoplados' },
+      ];
+
+      const bonus = [
+        'Experiencia previa integrando un POS, gateway de pago o proveedor de delivery',
+        'PostgreSQL para casos donde Mongo no encaja',
+        'PWAs',
+      ];
+
+      const mindset = [
+        { label: 'Autonomía real:', desc: 'no esperás que te digan qué hacer. Ves el problema, proponés solución, ejecutás.' },
+        { label: 'Ritmo startup:', desc: 'sabés que las prioridades pueden cambiar y te adaptás rápido sin drama.' },
+        { label: 'Foco en producción:', desc: 'te importa que el código corra bien con tráfico real, no solo que pase los tests en local.' },
+        { label: 'Comunicación directa:', desc: 'decís lo que pensás, sin vueltas. Si algo no encaja, lo decís.' },
+        { label: 'Construir, no mantener:', desc: 'te gusta más resolver cosas nuevas que hacer maintenance de legacy.' },
+      ];
+
+      const claudeCode = [
+        'CLAUDE.md armado en tus proyectos',
+        'Hooks configurados',
+        'MCPs custom o de la lista',
+        'Comandos slash habituales (/init, /compact, /model, etc.)',
+        'Idealmente agents armados para tareas repetitivas',
+      ];
+
+      return (
+        <section ref={ref} id="requisitos" className="py-20 md:py-28 px-5 md:px-10">
+          <div className="max-w-6xl mx-auto">
+            <div className="req-r inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6">
+              <span className="text-primary text-xs font-mono font-medium tracking-wider uppercase">Requisitos</span>
+            </div>
+
+            <h2 className="req-r font-heading font-extrabold text-ink leading-[1.05] tracking-[-0.03em] mb-3" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
+              Requisitos para sumarte{' '}
+              <span className="italic font-medium text-primary">al equipo</span>
+            </h2>
+            <p className="req-r text-ink-2 text-base leading-relaxed max-w-3xl mb-10 font-sans">
+              Para que esta colaboración funcione bien desde el día 1, necesitamos que cumplas con estos puntos. <strong className="text-ink font-heading">Si los cumplís todos, podés aplicar y avanzamos a la entrevista con Leandro (CTO).</strong>
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-5 mb-8">
+              {/* Bloque 1 — Técnico */}
+              <div className="req-r md:col-span-2 p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
+                <div className="flex items-center gap-2.5 mb-5">
+                  <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+                    <span className="text-base">🛠️</span>
+                  </div>
+                  <div>
+                    <p className="font-heading font-bold text-ink text-base">Bloque 1 — Técnico</p>
+                    <p className="text-ink-3 text-xs font-sans">Stack y experiencia profesional</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 mb-5">
+                  {techStack.map((t, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <span className="text-primary mt-0.5 flex-shrink-0">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                      <p className="text-ink-2 text-sm font-sans leading-relaxed"><strong className="text-ink font-heading">{t.label}</strong> — {t.desc}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="font-heading font-bold text-ink text-sm mb-3">Patterns y arquitectura que tenés que conocer</p>
+                <div className="space-y-2 mb-5">
+                  {patterns.map((p, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <span className="text-primary mt-0.5 flex-shrink-0">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                      <p className="text-ink-2 text-sm font-sans leading-relaxed"><strong className="text-ink font-heading">{p.label}</strong> — {p.desc}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="p-4 rounded-xl bg-primary-surface">
+                  <p className="font-heading font-bold text-ink text-xs mb-2">Bonus (no excluyentes pero suman)</p>
+                  <div className="space-y-1.5">
+                    {bonus.map((b, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <span className="text-primary/40 mt-0.5 text-xs">+</span>
+                        <p className="text-ink-2 text-xs font-sans leading-relaxed">{b}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bloques 2 y 3 — columna derecha */}
+              <div className="space-y-5">
+                {/* Bloque 2 — Mentalidad */}
+                <div className="req-r p-6 md:p-7 rounded-[28px] bg-white border border-border card-hover">
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center flex-shrink-0">
+                      <span className="text-base">🧠</span>
+                    </div>
+                    <p className="font-heading font-bold text-ink text-base">Bloque 2 — Mentalidad</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    {mindset.map((m, i) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <span className="text-ink-3 mt-0.5 flex-shrink-0">—</span>
+                        <p className="text-ink-2 text-sm font-sans leading-relaxed"><strong className="text-ink font-heading">{m.label}</strong> {m.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bloque 3 — Excluyente */}
+                <div className="req-r p-6 md:p-7 rounded-[28px] bg-primary text-white card-hover relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #ffffff, transparent)', transform: 'translate(30%, -30%)' }}></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2.5 mb-4">
+                      <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
+                        <span className="text-base">🔒</span>
+                      </div>
+                      <div>
+                        <p className="font-heading font-bold text-white text-base">Bloque 3 — Excluyente</p>
+                        <p className="text-white/50 text-xs font-sans">NO negociable</p>
+                      </div>
+                    </div>
+
+                    <p className="font-heading font-bold text-white text-sm mb-3 leading-snug">
+                      Usás Claude Code (de Anthropic) en tu flujo de desarrollo diario.
+                    </p>
+                    <p className="text-white/60 text-xs font-sans leading-relaxed mb-3">
+                      No Claude.ai web. No solo Cursor con la API. <strong className="text-white">Claude Code</strong> — el CLI / IDE extension de Anthropic — integrado a tu workflow real:
+                    </p>
+                    <div className="space-y-1.5 mb-4">
+                      {claudeCode.map((c, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <span className="text-white/40 mt-0.5 flex-shrink-0">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          </span>
+                          <p className="text-white/70 text-xs font-sans leading-relaxed">{c}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-white/40 text-[11px] font-sans leading-relaxed">
+                      Si solo lo probaste un par de veces para curiosear, no aplica. Si lo usás todos los días, hablamos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Closing text */}
+            <div className="req-r p-5 md:p-6 rounded-2xl bg-primary/[0.04] border border-primary/10 text-center">
+              <p className="text-ink text-sm md:text-base leading-relaxed font-sans">
+                <strong className="font-heading">Si cumplís los 3 bloques</strong> (técnico + mentalidad + excluyente Claude Code), <strong className="font-heading text-primary">aplicá</strong>. Te respondemos en 24-48 hs hábiles. La entrevista la conduce directamente Leandro Rebequi (CTO Deenex), 30 min por Meet, en alguno de los slots disponibles.
+              </p>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ============================================================
        COMPENSATION
     ============================================================ */
     function Compensation() {
@@ -1029,6 +1211,7 @@
           <Manifesto />
           <TheRole />
           <Profile />
+          <Requirements />
           <Compensation />
           <WhatWeOffer />
           <FounderQuote />

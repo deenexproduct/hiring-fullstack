@@ -913,33 +913,41 @@
 
     function ApplicationModal({ isOpen, onClose }) {
       const [formData, setFormData] = useState({
-        nombre: '', email: '', whatsapp: '', ubicacion: '', startup: '', startupDetalle: '',
-        experiencia: '', stack: [], claudeCode: '', claudeCodeDetalle: '', repo: '', extra: ''
+        nombre: '', email: '', whatsapp: '', linkedin: '', ubicacion: '',
+        trabajando_actualmente: '', startup_previa: '', startup_detalle: '',
+        anios_exp_total: '', anios_react_ts: '', anios_node: '', anios_mongodb: '', anios_redis_queues: '',
+        exp_microservicios: '', caso_microservicios: '',
+        exp_async: '', caso_async: '',
+        exp_integraciones: '', caso_integraciones: '',
+        claude_code_diario: '', claude_code_como: '',
+        repo: '', cuando_arranca: '', horas_semana: '', pretension_fulltime: '',
+        como_te_enteraste: '', notas_extra: ''
       });
       const [submitting, setSubmitting] = useState(false);
       const [success, setSuccess] = useState(false);
       const [error, setError] = useState('');
 
-      const stackOptions = ['React', 'TypeScript', 'Node.js', 'Express', 'NestJS', 'MongoDB', 'PostgreSQL', 'Redis', 'BullMQ', 'Tailwind', 'Other'];
-
-      const toggleStack = (tech) => {
-        setFormData(prev => ({
-          ...prev,
-          stack: prev.stack.includes(tech) ? prev.stack.filter(t => t !== tech) : [...prev.stack, tech]
-        }));
-      };
+      const update = (k, v) => setFormData(p => ({ ...p, [k]: v }));
 
       const validate = () => {
         if (!formData.nombre.trim()) return 'Nombre completo es obligatorio';
-        if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Email válido es obligatorio';
-        if (!formData.whatsapp.trim() || formData.whatsapp.replace(/\D/g, '').length < 10) return 'WhatsApp con código de país (mínimo 10 dígitos)';
-        if (!formData.ubicacion) return 'Seleccioná tu ubicación';
-        if (!formData.startup) return 'Indicá si trabajaste en startup';
-        if (!formData.experiencia) return 'Seleccioná años de experiencia';
-        if (formData.stack.length === 0) return 'Seleccioná al menos una tecnología';
-        if (!formData.claudeCode) return 'Indicá tu uso de Claude Code';
-        if (!formData.repo.trim()) return 'Repo o portfolio es obligatorio';
-        try { new URL(formData.repo); } catch { return 'URL de repo/portfolio no válida'; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Email válido es obligatorio';
+        if (formData.whatsapp.replace(/\D/g, '').length < 10) return 'WhatsApp con código de país (mínimo 10 dígitos)';
+        if (!formData.ubicacion) return 'Indicá tu ubicación (Bloque 1)';
+        if (!formData.trabajando_actualmente) return 'Indicá tu situación laboral actual (Bloque 2)';
+        if (!formData.startup_previa) return 'Indicá si trabajaste en startup (Bloque 2)';
+        if (!formData.anios_exp_total) return 'Indicá tus años de experiencia full-stack (Bloque 2)';
+        if (!formData.anios_react_ts) return 'Indicá años con React+TS (Bloque 3)';
+        if (!formData.anios_node) return 'Indicá años con Node.js (Bloque 3)';
+        if (!formData.anios_mongodb) return 'Indicá años con MongoDB (Bloque 3)';
+        if (!formData.exp_microservicios) return 'Indicá experiencia con microservicios (Bloque 3)';
+        if (!formData.exp_async) return 'Indicá experiencia con sistemas async (Bloque 3)';
+        if (!formData.exp_integraciones) return 'Indicá experiencia con integraciones (Bloque 3)';
+        if (!formData.claude_code_diario) return 'Indicá tu uso de Claude Code (Bloque 4)';
+        if (!formData.cuando_arranca) return 'Indicá cuándo podés arrancar (Bloque 5)';
+        if (!formData.horas_semana) return 'Indicá horas semanales disponibles (Bloque 5)';
+        if (!formData.repo.trim()) return 'Repo o portfolio es obligatorio (Bloque 6)';
+        try { new URL(formData.repo); } catch { return 'URL de repo/portfolio no válida (Bloque 6)'; }
         return null;
       };
 
@@ -950,15 +958,16 @@
         setError('');
         setSubmitting(true);
         try {
+          const utm = new URLSearchParams(window.location.search).get('utm_source') || 'direct';
           await fetch(FORM_ENDPOINT, {
             method: 'POST',
             mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...formData, stack: formData.stack.join(', '), timestamp: new Date().toISOString() })
+            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+            body: JSON.stringify({ ...formData, utm, user_agent: navigator.userAgent.slice(0, 200), timestamp: new Date().toISOString() })
           });
           setSuccess(true);
         } catch (e) {
-          setError('No pudimos enviar el formulario. Intentá de nuevo en unos minutos o escribinos a rebequileandro@gmail.com');
+          setError('No pudimos enviar el formulario. Probá de nuevo o escribinos a rebequileandro@gmail.com');
         } finally {
           setSubmitting(false);
         }
@@ -968,12 +977,47 @@
 
       const inputClass = "w-full px-4 py-3 rounded-xl border border-border bg-white text-ink text-sm font-sans focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors";
       const labelClass = "block font-heading font-semibold text-ink text-sm mb-1.5";
-      const radioGroupClass = "flex flex-wrap gap-3";
+      const radioGroupClass = "flex flex-wrap gap-2.5";
       const radioClass = (selected) => `px-4 py-2.5 rounded-xl border text-sm font-sans cursor-pointer transition-all ${selected ? 'bg-primary text-white border-primary' : 'bg-white text-ink-2 border-border hover:border-primary/30'}`;
+      const blockTitle = "font-heading font-extrabold text-ink text-base tracking-tight";
+      const blockSub = "text-ink-3 text-xs font-sans uppercase tracking-wider mb-1";
+
+      const Block = ({ num, title, children }) => (
+        <div className="space-y-4 pt-6 first:pt-0 border-t first:border-t-0 border-border">
+          <div>
+            <p className={blockSub}>Bloque {num} de 6</p>
+            <h4 className={blockTitle}>{title}</h4>
+          </div>
+          {children}
+        </div>
+      );
+
+      const Field = ({ label, children, hint }) => (
+        <div>
+          <label className={labelClass}>{label}</label>
+          {hint && <p className="text-ink-3 text-xs font-sans -mt-1 mb-2">{hint}</p>}
+          {children}
+        </div>
+      );
+
+      const RadioGroup = ({ name, options }) => (
+        <div className={radioGroupClass}>
+          {options.map(opt => (
+            <button type="button" key={opt} className={radioClass(formData[name] === opt)} onClick={() => update(name, opt)}>{opt}</button>
+          ))}
+        </div>
+      );
+
+      const Select = ({ name, options }) => (
+        <select className={inputClass} value={formData[name]} onChange={e => update(name, e.target.value)}>
+          <option value="">Seleccionar...</option>
+          {options.map(o => <option key={o} value={o}>{o}</option>)}
+        </select>
+      );
 
       return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={onClose}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-6 py-4 border-b border-border rounded-t-2xl">
               <h3 className="font-heading font-bold text-ink text-lg">{success ? '¡Aplicación recibida!' : 'Aplicar como Full-Stack Engineer'}</h3>
               <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-primary/5 transition-colors">
@@ -992,89 +1036,110 @@
                   <button onClick={onClose} className="btn-primary px-8 py-3 bg-primary text-white font-heading font-bold text-sm rounded-xl">Cerrar</button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-2">
                   {error && <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-sans">{error}</div>}
 
-                  <div>
-                    <label className={labelClass}>Nombre completo *</label>
-                    <input type="text" className={inputClass} placeholder="Tu nombre completo" value={formData.nombre} onChange={e => setFormData(p => ({...p, nombre: e.target.value}))} />
-                  </div>
+                  <Block num="1" title="Datos básicos">
+                    <Field label="Nombre completo *">
+                      <input type="text" className={inputClass} placeholder="Tu nombre completo" value={formData.nombre} onChange={e => update('nombre', e.target.value)} />
+                    </Field>
+                    <Field label="Email *">
+                      <input type="email" className={inputClass} placeholder="tu@email.com" value={formData.email} onChange={e => update('email', e.target.value)} />
+                    </Field>
+                    <Field label="WhatsApp (con código país) *">
+                      <input type="tel" className={inputClass} placeholder="+54 9 11 1234-5678" value={formData.whatsapp} onChange={e => update('whatsapp', e.target.value)} />
+                    </Field>
+                    <Field label="LinkedIn URL" hint="Tu perfil de LinkedIn (opcional pero suma)">
+                      <input type="url" className={inputClass} placeholder="https://linkedin.com/in/tu-usuario" value={formData.linkedin} onChange={e => update('linkedin', e.target.value)} />
+                    </Field>
+                    <Field label="¿Vivís en CABA o GBA? *">
+                      <RadioGroup name="ubicacion" options={['Sí, CABA', 'Sí, GBA', 'No, vivo en otra ciudad']} />
+                    </Field>
+                  </Block>
 
-                  <div>
-                    <label className={labelClass}>Email *</label>
-                    <input type="email" className={inputClass} placeholder="tu@email.com" value={formData.email} onChange={e => setFormData(p => ({...p, email: e.target.value}))} />
-                  </div>
+                  <Block num="2" title="Experiencia general">
+                    <Field label="¿Estás trabajando actualmente? *">
+                      <RadioGroup name="trabajando_actualmente" options={['Sí, full-time', 'Sí, freelance / por proyecto', 'No, estoy buscando']} />
+                    </Field>
+                    <Field label="¿Trabajaste en startup antes? *">
+                      <RadioGroup name="startup_previa" options={['Sí', 'No']} />
+                      {formData.startup_previa === 'Sí' && (
+                        <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos cuál(es) y qué hacías ahí (1-2 líneas)" value={formData.startup_detalle} onChange={e => update('startup_detalle', e.target.value)} />
+                      )}
+                    </Field>
+                    <Field label="Años de experiencia full-stack *">
+                      <Select name="anios_exp_total" options={['Menos de 1', '1-2', '3-4', '5-7', '8+']} />
+                    </Field>
+                  </Block>
 
-                  <div>
-                    <label className={labelClass}>WhatsApp (con código país) *</label>
-                    <input type="tel" className={inputClass} placeholder="+54 9 11 1234-5678" value={formData.whatsapp} onChange={e => setFormData(p => ({...p, whatsapp: e.target.value}))} />
-                  </div>
+                  <Block num="3" title="Stack técnico">
+                    <Field label="Años con React + TypeScript *">
+                      <Select name="anios_react_ts" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                    </Field>
+                    <Field label="Años con Node.js *">
+                      <Select name="anios_node" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                    </Field>
+                    <Field label="Años con MongoDB *">
+                      <Select name="anios_mongodb" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                    </Field>
+                    <Field label="Años con Redis o queues (BullMQ, etc.)">
+                      <Select name="anios_redis_queues" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                    </Field>
+                    <Field label="¿Trabajaste con microservicios? *">
+                      <RadioGroup name="exp_microservicios" options={['Sí, varios', 'Sí, uno', 'No']} />
+                      {(formData.exp_microservicios === 'Sí, varios' || formData.exp_microservicios === 'Sí, uno') && (
+                        <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos brevemente cómo estaban estructurados y qué resolvías" value={formData.caso_microservicios} onChange={e => update('caso_microservicios', e.target.value)} />
+                      )}
+                    </Field>
+                    <Field label="¿Trabajaste con sistemas async / event-driven? *">
+                      <RadioGroup name="exp_async" options={['Sí, en producción', 'Sí, en proyectos personales', 'No']} />
+                      {formData.exp_async.startsWith('Sí') && (
+                        <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos un caso (qué stack: BullMQ, RabbitMQ, Kafka, etc., qué problema resolvías)" value={formData.caso_async} onChange={e => update('caso_async', e.target.value)} />
+                      )}
+                    </Field>
+                    <Field label="¿Integraste alguna vez un POS, gateway de pago o proveedor de delivery? *">
+                      <RadioGroup name="exp_integraciones" options={['Sí, varios', 'Sí, uno', 'No nunca']} />
+                      {formData.exp_integraciones.startsWith('Sí') && (
+                        <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Decinos cuál (Mercado Pago / Fudo / PedidosYa / etc.) y qué fue lo más complicado" value={formData.caso_integraciones} onChange={e => update('caso_integraciones', e.target.value)} />
+                      )}
+                    </Field>
+                  </Block>
 
-                  <div>
-                    <label className={labelClass}>¿Vivís en CABA o GBA? *</label>
-                    <div className={radioGroupClass}>
-                      {['Sí, CABA', 'Sí, GBA', 'No, otra'].map(opt => (
-                        <button type="button" key={opt} className={radioClass(formData.ubicacion === opt)} onClick={() => setFormData(p => ({...p, ubicacion: opt}))}>{opt}</button>
-                      ))}
-                    </div>
-                  </div>
+                  <Block num="4" title="Claude Code (excluyente)">
+                    <Field label="¿Usás Claude Code (CLI/IDE de Anthropic) DIARIO? *">
+                      <RadioGroup name="claude_code_diario" options={['Sí, todos los días', 'Lo uso pero no diario', 'No']} />
+                      {formData.claude_code_diario === 'Sí, todos los días' && (
+                        <textarea className={`${inputClass} mt-3`} rows="3" placeholder="Contanos cómo lo integrás (CLAUDE.md, hooks, MCPs, comandos slash, agents)" value={formData.claude_code_como} onChange={e => update('claude_code_como', e.target.value)} />
+                      )}
+                    </Field>
+                  </Block>
 
-                  <div>
-                    <label className={labelClass}>¿Trabajaste en startup antes? *</label>
-                    <div className={radioGroupClass}>
-                      {['Sí', 'No'].map(opt => (
-                        <button type="button" key={opt} className={radioClass(formData.startup === opt)} onClick={() => setFormData(p => ({...p, startup: opt}))}>{opt}</button>
-                      ))}
-                    </div>
-                    {formData.startup === 'Sí' && (
-                      <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos brevemente cuál y qué hacías" value={formData.startupDetalle} onChange={e => setFormData(p => ({...p, startupDetalle: e.target.value}))} />
-                    )}
-                  </div>
+                  <Block num="5" title="Disponibilidad y compensación">
+                    <Field label="¿Cuándo podés arrancar? *">
+                      <RadioGroup name="cuando_arranca" options={['Esta semana', 'Próxima semana', 'En 2 semanas', '1 mes o más']} />
+                    </Field>
+                    <Field label="Horas semanales que podés dedicar al pack *">
+                      <Select name="horas_semana" options={['Menos de 15 hs/sem', '15-25 hs/sem', '25-40 hs/sem', 'Full-time (40+)']} />
+                    </Field>
+                    <Field label="Pretensión salarial mensual en USD si esto escala a full-time" hint="Opcional, ayuda a alinear expectativas">
+                      <input type="text" className={inputClass} placeholder="Ej: USD 3.500 / mes" value={formData.pretension_fulltime} onChange={e => update('pretension_fulltime', e.target.value)} />
+                    </Field>
+                  </Block>
 
-                  <div>
-                    <label className={labelClass}>Años de experiencia full-stack *</label>
-                    <select className={inputClass} value={formData.experiencia} onChange={e => setFormData(p => ({...p, experiencia: e.target.value}))}>
-                      <option value="">Seleccionar...</option>
-                      <option value="<3">Menos de 3</option>
-                      <option value="3-5">3 a 5</option>
-                      <option value="5-8">5 a 8</option>
-                      <option value="8+">8+</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Stack principal que usaste *</label>
-                    <div className="flex flex-wrap gap-2">
-                      {stackOptions.map(tech => (
-                        <button type="button" key={tech} className={radioClass(formData.stack.includes(tech))} onClick={() => toggleStack(tech)}>{tech}</button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>¿Usás Claude Code DIARIO? *</label>
-                    <div className={radioGroupClass}>
-                      {['Sí, todos los días', 'Lo uso pero no diario', 'No'].map(opt => (
-                        <button type="button" key={opt} className={radioClass(formData.claudeCode === opt)} onClick={() => setFormData(p => ({...p, claudeCode: opt}))}>{opt}</button>
-                      ))}
-                    </div>
-                    {formData.claudeCode === 'Sí, todos los días' && (
-                      <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos cómo lo integrás (CLAUDE.md, hooks, MCPs, comandos slash)" value={formData.claudeCodeDetalle} onChange={e => setFormData(p => ({...p, claudeCodeDetalle: e.target.value}))} />
-                    )}
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Repo público o portfolio *</label>
-                    <input type="url" className={inputClass} placeholder="https://github.com/tu-usuario o https://tudominio.com" value={formData.repo} onChange={e => setFormData(p => ({...p, repo: e.target.value}))} />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>¿Algo más que quieras contar?</label>
-                    <textarea className={inputClass} rows="3" placeholder="Opcional" value={formData.extra} onChange={e => setFormData(p => ({...p, extra: e.target.value}))} />
-                  </div>
+                  <Block num="6" title="Origen y notas">
+                    <Field label="Repo público o portfolio *">
+                      <input type="url" className={inputClass} placeholder="https://github.com/tu-usuario o https://tudominio.com" value={formData.repo} onChange={e => update('repo', e.target.value)} />
+                    </Field>
+                    <Field label="¿Cómo te enteraste de Deenex?">
+                      <Select name="como_te_enteraste" options={['Publicación de Alan en LinkedIn', 'Búsqueda en LinkedIn Jobs', 'Referido (decinos quién abajo)', 'Otra red social', 'Otra (decinos abajo)']} />
+                    </Field>
+                    <Field label="¿Algo más que quieras contar?" hint="Si te referenció alguien, decinos su nombre acá. O cualquier cosa relevante.">
+                      <textarea className={inputClass} rows="3" placeholder="Opcional" value={formData.notas_extra} onChange={e => update('notas_extra', e.target.value)} />
+                    </Field>
+                  </Block>
 
                   <button type="submit" disabled={submitting}
-                    className="btn-primary w-full py-4 bg-primary text-white font-heading font-bold text-base rounded-xl shadow-lg shadow-primary/20 disabled:opacity-60 disabled:cursor-not-allowed">
+                    className="btn-primary w-full mt-6 py-4 bg-primary text-white font-heading font-bold text-base rounded-xl shadow-lg shadow-primary/20 disabled:opacity-60 disabled:cursor-not-allowed">
                     {submitting ? 'Enviando...' : '⚡ ENVIAR APLICACIÓN'}
                   </button>
                 </form>
@@ -1084,6 +1149,7 @@
         </div>
       );
     }
+
 
     function ComoAplicar() {
       const ref = useRef(null);

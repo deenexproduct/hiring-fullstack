@@ -912,10 +912,13 @@
     const FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbyyzsnjrL7Thiou73B3U3gnEN2jTKDubs-85SV12TO3bUAGUbl-y50W3YaNgegLygpA/exec";
 
     function ApplicationModal({ isOpen, onClose }) {
+      const [step, setStep] = useState(0);
+      const [direction, setDirection] = useState('forward');
       const [formData, setFormData] = useState({
         nombre: '', email: '', whatsapp: '', linkedin: '', ubicacion: '',
         trabajando_actualmente: '', startup_previa: '', startup_detalle: '',
-        anios_exp_total: '', anios_react_ts: '', anios_node: '', anios_mongodb: '', anios_redis_queues: '',
+        anios_exp_total: '',
+        anios_react_ts: '', anios_node: '', anios_mongodb: '', anios_redis_queues: '',
         exp_microservicios: '', caso_microservicios: '',
         exp_async: '', caso_async: '',
         exp_integraciones: '', caso_integraciones: '',
@@ -929,31 +932,77 @@
 
       const update = (k, v) => setFormData(p => ({ ...p, [k]: v }));
 
-      const validate = () => {
-        if (!formData.nombre.trim()) return 'Nombre completo es obligatorio';
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Email válido es obligatorio';
-        if (formData.whatsapp.replace(/\D/g, '').length < 10) return 'WhatsApp con código de país (mínimo 10 dígitos)';
-        if (!formData.ubicacion) return 'Indicá tu ubicación (Bloque 1)';
-        if (!formData.trabajando_actualmente) return 'Indicá tu situación laboral actual (Bloque 2)';
-        if (!formData.startup_previa) return 'Indicá si trabajaste en startup (Bloque 2)';
-        if (!formData.anios_exp_total) return 'Indicá tus años de experiencia full-stack (Bloque 2)';
-        if (!formData.anios_react_ts) return 'Indicá años con React+TS (Bloque 3)';
-        if (!formData.anios_node) return 'Indicá años con Node.js (Bloque 3)';
-        if (!formData.anios_mongodb) return 'Indicá años con MongoDB (Bloque 3)';
-        if (!formData.exp_microservicios) return 'Indicá experiencia con microservicios (Bloque 3)';
-        if (!formData.exp_async) return 'Indicá experiencia con sistemas async (Bloque 3)';
-        if (!formData.exp_integraciones) return 'Indicá experiencia con integraciones (Bloque 3)';
-        if (!formData.claude_code_diario) return 'Indicá tu uso de Claude Code (Bloque 4)';
-        if (!formData.cuando_arranca) return 'Indicá cuándo podés arrancar (Bloque 5)';
-        if (!formData.horas_semana) return 'Indicá horas semanales disponibles (Bloque 5)';
-        if (!formData.repo.trim()) return 'Repo o portfolio es obligatorio (Bloque 6)';
-        try { new URL(formData.repo); } catch { return 'URL de repo/portfolio no válida (Bloque 6)'; }
+      // Reset al cerrar (para que la próxima apertura sea fresh)
+      useEffect(() => {
+        if (!isOpen) {
+          setTimeout(() => {
+            if (success) {
+              setSuccess(false);
+              setStep(0);
+              setError('');
+            }
+          }, 300);
+        }
+      }, [isOpen, success]);
+
+      const stepsMeta = [
+        { num: 1, key: 'datos', label: 'Datos básicos', icon: '👤' },
+        { num: 2, key: 'experiencia', label: 'Experiencia', icon: '💼' },
+        { num: 3, key: 'stack', label: 'Stack técnico', icon: '🛠️' },
+        { num: 4, key: 'claude', label: 'Claude Code', icon: '🔒' },
+        { num: 5, key: 'disponibilidad', label: 'Disponibilidad', icon: '⏱️' },
+        { num: 6, key: 'origen', label: 'Origen', icon: '📨' },
+      ];
+
+      const validateStep = (s) => {
+        if (s === 0) {
+          if (!formData.nombre.trim()) return 'Nombre completo es obligatorio';
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Email válido es obligatorio';
+          if (formData.whatsapp.replace(/\D/g, '').length < 10) return 'WhatsApp con código de país (mínimo 10 dígitos)';
+          if (!formData.ubicacion) return 'Indicá tu ubicación';
+        }
+        if (s === 1) {
+          if (!formData.trabajando_actualmente) return 'Indicá tu situación laboral actual';
+          if (!formData.startup_previa) return 'Indicá si trabajaste en startup';
+          if (!formData.anios_exp_total) return 'Indicá tus años de experiencia full-stack';
+        }
+        if (s === 2) {
+          if (!formData.anios_react_ts) return 'Indicá años con React+TS';
+          if (!formData.anios_node) return 'Indicá años con Node.js';
+          if (!formData.anios_mongodb) return 'Indicá años con MongoDB';
+          if (!formData.exp_microservicios) return 'Indicá experiencia con microservicios';
+          if (!formData.exp_async) return 'Indicá experiencia con sistemas async';
+          if (!formData.exp_integraciones) return 'Indicá experiencia con integraciones';
+        }
+        if (s === 3) {
+          if (!formData.claude_code_diario) return 'Indicá tu uso de Claude Code';
+        }
+        if (s === 4) {
+          if (!formData.cuando_arranca) return 'Indicá cuándo podés arrancar';
+          if (!formData.horas_semana) return 'Indicá horas semanales disponibles';
+        }
+        if (s === 5) {
+          if (!formData.repo.trim()) return 'Repo o portfolio es obligatorio';
+          try { new URL(formData.repo); } catch { return 'URL de repo/portfolio no válida'; }
+        }
         return null;
       };
 
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        const err = validate();
+      const next = () => {
+        const err = validateStep(step);
+        if (err) { setError(err); return; }
+        setError('');
+        setDirection('forward');
+        setStep(s => Math.min(s + 1, stepsMeta.length - 1));
+      };
+      const prev = () => {
+        setError('');
+        setDirection('back');
+        setStep(s => Math.max(s - 1, 0));
+      };
+
+      const handleSubmit = async () => {
+        const err = validateStep(stepsMeta.length - 1);
         if (err) { setError(err); return; }
         setError('');
         setSubmitting(true);
@@ -978,28 +1027,15 @@
       const inputClass = "w-full px-4 py-3 rounded-xl border border-border bg-white text-ink text-sm font-sans focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors";
       const labelClass = "block font-heading font-semibold text-ink text-sm mb-1.5";
       const radioGroupClass = "flex flex-wrap gap-2.5";
-      const radioClass = (selected) => `px-4 py-2.5 rounded-xl border text-sm font-sans cursor-pointer transition-all ${selected ? 'bg-primary text-white border-primary' : 'bg-white text-ink-2 border-border hover:border-primary/30'}`;
-      const blockTitle = "font-heading font-extrabold text-ink text-base tracking-tight";
-      const blockSub = "text-ink-3 text-xs font-sans uppercase tracking-wider mb-1";
+      const radioClass = (selected) => `px-4 py-2.5 rounded-xl border text-sm font-sans cursor-pointer transition-all ${selected ? 'bg-primary text-white border-primary shadow-md shadow-primary/20' : 'bg-white text-ink-2 border-border hover:border-primary/40 hover:bg-primary/5'}`;
 
-      const Block = ({ num, title, children }) => (
-        <div className="space-y-4 pt-6 first:pt-0 border-t first:border-t-0 border-border">
-          <div>
-            <p className={blockSub}>Bloque {num} de 6</p>
-            <h4 className={blockTitle}>{title}</h4>
-          </div>
-          {children}
-        </div>
-      );
-
-      const Field = ({ label, children, hint }) => (
+      const Field = ({ label, hint, children }) => (
         <div>
           <label className={labelClass}>{label}</label>
           {hint && <p className="text-ink-3 text-xs font-sans -mt-1 mb-2">{hint}</p>}
           {children}
         </div>
       );
-
       const RadioGroup = ({ name, options }) => (
         <div className={radioGroupClass}>
           {options.map(opt => (
@@ -1007,7 +1043,6 @@
           ))}
         </div>
       );
-
       const Select = ({ name, options }) => (
         <select className={inputClass} value={formData[name]} onChange={e => update(name, e.target.value)}>
           <option value="">Seleccionar...</option>
@@ -1015,134 +1050,208 @@
         </select>
       );
 
+      const StepHeader = ({ num, total, title, subtitle }) => (
+        <div className="mb-6">
+          <p className="text-primary text-xs font-mono uppercase tracking-widest mb-1.5">Paso {num} de {total}</p>
+          <h4 className="font-heading font-extrabold text-ink text-2xl tracking-tight mb-1">{title}</h4>
+          {subtitle && <p className="text-ink-2 text-sm font-sans">{subtitle}</p>}
+        </div>
+      );
+
+      const stepKeys = stepsMeta.map(s => s.key);
+      const currentStepKey = stepKeys[step];
+
       return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={onClose}>
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-6 py-4 border-b border-border rounded-t-2xl">
-              <h3 className="font-heading font-bold text-ink text-lg">{success ? '¡Aplicación recibida!' : 'Aplicar como Full-Stack Engineer'}</h3>
-              <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-primary/5 transition-colors">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-              </button>
+            {/* Header sticky con título + close */}
+            <div className="sticky top-0 bg-white z-10 px-6 pt-5 pb-4 border-b border-border rounded-t-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-heading font-bold text-ink text-lg">{success ? '¡Aplicación recibida!' : 'Aplicar como Full-Stack Engineer'}</h3>
+                <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-primary/5 transition-colors">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+              </div>
+
+              {/* Progress bar visual con steps */}
+              {!success && (
+                <div className="flex items-center gap-1.5">
+                  {stepsMeta.map((s, idx) => (
+                    <button
+                      key={s.key}
+                      type="button"
+                      onClick={() => { if (idx <= step) { setStep(idx); setError(''); } }}
+                      className={`flex-1 h-1.5 rounded-full transition-all ${idx < step ? 'bg-primary' : idx === step ? 'bg-primary' : 'bg-border'}`}
+                      title={`${s.icon} ${s.label}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="p-6">
               {success ? (
-                <div className="text-center py-8">
-                  <span className="text-6xl block mb-4">✅</span>
-                  <h4 className="font-heading font-extrabold text-ink text-xl mb-3">¡Aplicación recibida!</h4>
+                <div className="text-center py-10">
+                  <span className="text-7xl block mb-5">✅</span>
+                  <h4 className="font-heading font-extrabold text-ink text-2xl mb-3">¡Aplicación recibida!</h4>
                   <p className="text-ink-2 text-base font-sans leading-relaxed max-w-md mx-auto mb-6">
                     Recibimos tu aplicación, gracias por tomarte el tiempo. <strong className="text-ink font-heading">Te vamos a contactar en las próximas 24-48 hs hábiles</strong> para coordinar una reunión con Leandro Rebequi (CTO Deenex).
                   </p>
                   <button onClick={onClose} className="btn-primary px-8 py-3 bg-primary text-white font-heading font-bold text-sm rounded-xl">Cerrar</button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-2">
+                <div className="space-y-5" key={`step-${step}`} style={{ animation: `${direction === 'forward' ? 'slideInRight' : 'slideInLeft'} 0.3s ease-out` }}>
                   {error && <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-sans">{error}</div>}
 
-                  <Block num="1" title="Datos básicos">
-                    <Field label="Nombre completo *">
-                      <input type="text" className={inputClass} placeholder="Tu nombre completo" value={formData.nombre} onChange={e => update('nombre', e.target.value)} />
-                    </Field>
-                    <Field label="Email *">
-                      <input type="email" className={inputClass} placeholder="tu@email.com" value={formData.email} onChange={e => update('email', e.target.value)} />
-                    </Field>
-                    <Field label="WhatsApp (con código país) *">
-                      <input type="tel" className={inputClass} placeholder="+54 9 11 1234-5678" value={formData.whatsapp} onChange={e => update('whatsapp', e.target.value)} />
-                    </Field>
-                    <Field label="LinkedIn URL" hint="Tu perfil de LinkedIn (opcional pero suma)">
-                      <input type="url" className={inputClass} placeholder="https://linkedin.com/in/tu-usuario" value={formData.linkedin} onChange={e => update('linkedin', e.target.value)} />
-                    </Field>
-                    <Field label="¿Vivís en CABA o GBA? *">
-                      <RadioGroup name="ubicacion" options={['Sí, CABA', 'Sí, GBA', 'No, vivo en otra ciudad']} />
-                    </Field>
-                  </Block>
+                  {currentStepKey === 'datos' && (
+                    <>
+                      <StepHeader num="1" total="6" title="Datos básicos" subtitle="Para poder contactarte si calificás" />
+                      <Field label="Nombre completo *">
+                        <input type="text" className={inputClass} placeholder="Tu nombre completo" value={formData.nombre} onChange={e => update('nombre', e.target.value)} autoFocus />
+                      </Field>
+                      <Field label="Email *">
+                        <input type="email" className={inputClass} placeholder="tu@email.com" value={formData.email} onChange={e => update('email', e.target.value)} />
+                      </Field>
+                      <Field label="WhatsApp (con código país) *">
+                        <input type="tel" className={inputClass} placeholder="+54 9 11 1234-5678" value={formData.whatsapp} onChange={e => update('whatsapp', e.target.value)} />
+                      </Field>
+                      <Field label="LinkedIn URL" hint="Tu perfil de LinkedIn (opcional pero suma)">
+                        <input type="url" className={inputClass} placeholder="https://linkedin.com/in/tu-usuario" value={formData.linkedin} onChange={e => update('linkedin', e.target.value)} />
+                      </Field>
+                      <Field label="¿Vivís en CABA o GBA? *">
+                        <RadioGroup name="ubicacion" options={['Sí, CABA', 'Sí, GBA', 'No, vivo en otra ciudad']} />
+                      </Field>
+                    </>
+                  )}
 
-                  <Block num="2" title="Experiencia general">
-                    <Field label="¿Estás trabajando actualmente? *">
-                      <RadioGroup name="trabajando_actualmente" options={['Sí, full-time', 'Sí, freelance / por proyecto', 'No, estoy buscando']} />
-                    </Field>
-                    <Field label="¿Trabajaste en startup antes? *">
-                      <RadioGroup name="startup_previa" options={['Sí', 'No']} />
-                      {formData.startup_previa === 'Sí' && (
-                        <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos cuál(es) y qué hacías ahí (1-2 líneas)" value={formData.startup_detalle} onChange={e => update('startup_detalle', e.target.value)} />
-                      )}
-                    </Field>
-                    <Field label="Años de experiencia full-stack *">
-                      <Select name="anios_exp_total" options={['Menos de 1', '1-2', '3-4', '5-7', '8+']} />
-                    </Field>
-                  </Block>
+                  {currentStepKey === 'experiencia' && (
+                    <>
+                      <StepHeader num="2" total="6" title="Experiencia general" subtitle="Para entender de dónde venís" />
+                      <Field label="¿Estás trabajando actualmente? *">
+                        <RadioGroup name="trabajando_actualmente" options={['Sí, full-time', 'Sí, freelance / por proyecto', 'No, estoy buscando']} />
+                      </Field>
+                      <Field label="¿Trabajaste en startup antes? *">
+                        <RadioGroup name="startup_previa" options={['Sí', 'No']} />
+                        {formData.startup_previa === 'Sí' && (
+                          <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos cuál(es) y qué hacías ahí (1-2 líneas)" value={formData.startup_detalle} onChange={e => update('startup_detalle', e.target.value)} />
+                        )}
+                      </Field>
+                      <Field label="Años de experiencia full-stack *">
+                        <Select name="anios_exp_total" options={['Menos de 1', '1-2', '3-4', '5-7', '8+']} />
+                      </Field>
+                    </>
+                  )}
 
-                  <Block num="3" title="Stack técnico">
-                    <Field label="Años con React + TypeScript *">
-                      <Select name="anios_react_ts" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
-                    </Field>
-                    <Field label="Años con Node.js *">
-                      <Select name="anios_node" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
-                    </Field>
-                    <Field label="Años con MongoDB *">
-                      <Select name="anios_mongodb" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
-                    </Field>
-                    <Field label="Años con Redis o queues (BullMQ, etc.)">
-                      <Select name="anios_redis_queues" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
-                    </Field>
-                    <Field label="¿Trabajaste con microservicios? *">
-                      <RadioGroup name="exp_microservicios" options={['Sí, varios', 'Sí, uno', 'No']} />
-                      {(formData.exp_microservicios === 'Sí, varios' || formData.exp_microservicios === 'Sí, uno') && (
-                        <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos brevemente cómo estaban estructurados y qué resolvías" value={formData.caso_microservicios} onChange={e => update('caso_microservicios', e.target.value)} />
-                      )}
-                    </Field>
-                    <Field label="¿Trabajaste con sistemas async / event-driven? *">
-                      <RadioGroup name="exp_async" options={['Sí, en producción', 'Sí, en proyectos personales', 'No']} />
-                      {formData.exp_async.startsWith('Sí') && (
-                        <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos un caso (qué stack: BullMQ, RabbitMQ, Kafka, etc., qué problema resolvías)" value={formData.caso_async} onChange={e => update('caso_async', e.target.value)} />
-                      )}
-                    </Field>
-                    <Field label="¿Integraste alguna vez un POS, gateway de pago o proveedor de delivery? *">
-                      <RadioGroup name="exp_integraciones" options={['Sí, varios', 'Sí, uno', 'No nunca']} />
-                      {formData.exp_integraciones.startsWith('Sí') && (
-                        <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Decinos cuál (Mercado Pago / Fudo / PedidosYa / etc.) y qué fue lo más complicado" value={formData.caso_integraciones} onChange={e => update('caso_integraciones', e.target.value)} />
-                      )}
-                    </Field>
-                  </Block>
+                  {currentStepKey === 'stack' && (
+                    <>
+                      <StepHeader num="3" total="6" title="Stack técnico" subtitle="Lo más importante para nosotros" />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Field label="Años con React + TypeScript *">
+                          <Select name="anios_react_ts" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                        </Field>
+                        <Field label="Años con Node.js *">
+                          <Select name="anios_node" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                        </Field>
+                        <Field label="Años con MongoDB *">
+                          <Select name="anios_mongodb" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                        </Field>
+                        <Field label="Años con Redis / queues">
+                          <Select name="anios_redis_queues" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                        </Field>
+                      </div>
+                      <Field label="¿Trabajaste con microservicios? *">
+                        <RadioGroup name="exp_microservicios" options={['Sí, varios', 'Sí, uno', 'No']} />
+                        {(formData.exp_microservicios === 'Sí, varios' || formData.exp_microservicios === 'Sí, uno') && (
+                          <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos cómo estaban estructurados y qué resolvías" value={formData.caso_microservicios} onChange={e => update('caso_microservicios', e.target.value)} />
+                        )}
+                      </Field>
+                      <Field label="¿Trabajaste con sistemas async / event-driven? *">
+                        <RadioGroup name="exp_async" options={['Sí, en producción', 'Sí, en proyectos personales', 'No']} />
+                        {formData.exp_async.startsWith('Sí') && (
+                          <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Qué stack (BullMQ, RabbitMQ, Kafka, etc.) y qué problema resolvías" value={formData.caso_async} onChange={e => update('caso_async', e.target.value)} />
+                        )}
+                      </Field>
+                      <Field label="¿Integraste un POS, gateway de pago o proveedor de delivery? *">
+                        <RadioGroup name="exp_integraciones" options={['Sí, varios', 'Sí, uno', 'No nunca']} />
+                        {formData.exp_integraciones.startsWith('Sí') && (
+                          <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Cuál (Mercado Pago / Fudo / PedidosYa / etc.) y qué fue lo más complicado" value={formData.caso_integraciones} onChange={e => update('caso_integraciones', e.target.value)} />
+                        )}
+                      </Field>
+                    </>
+                  )}
 
-                  <Block num="4" title="Claude Code (excluyente)">
-                    <Field label="¿Usás Claude Code (CLI/IDE de Anthropic) DIARIO? *">
-                      <RadioGroup name="claude_code_diario" options={['Sí, todos los días', 'Lo uso pero no diario', 'No']} />
-                      {formData.claude_code_diario === 'Sí, todos los días' && (
-                        <textarea className={`${inputClass} mt-3`} rows="3" placeholder="Contanos cómo lo integrás (CLAUDE.md, hooks, MCPs, comandos slash, agents)" value={formData.claude_code_como} onChange={e => update('claude_code_como', e.target.value)} />
-                      )}
-                    </Field>
-                  </Block>
+                  {currentStepKey === 'claude' && (
+                    <>
+                      <StepHeader num="4" total="6" title="Claude Code (excluyente)" subtitle="Si no usás Claude Code diariamente, no podemos avanzar" />
+                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                        <p className="text-ink text-sm font-sans leading-relaxed">
+                          Buscamos a alguien que ya tenga <strong>Claude Code</strong> integrado en su workflow diario: <strong>CLAUDE.md</strong> en sus proyectos, <strong>hooks</strong>, <strong>MCPs</strong>, <strong>comandos slash</strong>, idealmente <strong>agents</strong>.
+                        </p>
+                      </div>
+                      <Field label="¿Usás Claude Code (CLI / IDE de Anthropic) DIARIO? *">
+                        <RadioGroup name="claude_code_diario" options={['Sí, todos los días', 'Lo uso pero no diario', 'No']} />
+                        {formData.claude_code_diario === 'Sí, todos los días' && (
+                          <textarea className={`${inputClass} mt-3`} rows="4" placeholder="Contanos cómo lo integrás (CLAUDE.md, hooks, MCPs custom, comandos slash habituales, agents armados)" value={formData.claude_code_como} onChange={e => update('claude_code_como', e.target.value)} />
+                        )}
+                      </Field>
+                    </>
+                  )}
 
-                  <Block num="5" title="Disponibilidad y compensación">
-                    <Field label="¿Cuándo podés arrancar? *">
-                      <RadioGroup name="cuando_arranca" options={['Esta semana', 'Próxima semana', 'En 2 semanas', '1 mes o más']} />
-                    </Field>
-                    <Field label="Horas semanales que podés dedicar al pack *">
-                      <Select name="horas_semana" options={['Menos de 15 hs/sem', '15-25 hs/sem', '25-40 hs/sem', 'Full-time (40+)']} />
-                    </Field>
-                    <Field label="Pretensión salarial mensual en USD si esto escala a full-time" hint="Opcional, ayuda a alinear expectativas">
-                      <input type="text" className={inputClass} placeholder="Ej: USD 3.500 / mes" value={formData.pretension_fulltime} onChange={e => update('pretension_fulltime', e.target.value)} />
-                    </Field>
-                  </Block>
+                  {currentStepKey === 'disponibilidad' && (
+                    <>
+                      <StepHeader num="5" total="6" title="Disponibilidad y compensación" subtitle="Para cerrar números antes de la entrevista" />
+                      <Field label="¿Cuándo podés arrancar? *">
+                        <RadioGroup name="cuando_arranca" options={['Esta semana', 'Próxima semana', 'En 2 semanas', '1 mes o más']} />
+                      </Field>
+                      <Field label="Horas semanales que podés dedicar al pack *">
+                        <Select name="horas_semana" options={['Menos de 15 hs/sem', '15-25 hs/sem', '25-40 hs/sem', 'Full-time (40+)']} />
+                      </Field>
+                      <Field label="Pretensión salarial mensual en USD si esto escala a full-time" hint="Opcional. Nos ayuda a alinear expectativas">
+                        <input type="text" className={inputClass} placeholder="Ej: USD 3.500 / mes" value={formData.pretension_fulltime} onChange={e => update('pretension_fulltime', e.target.value)} />
+                      </Field>
+                    </>
+                  )}
 
-                  <Block num="6" title="Origen y notas">
-                    <Field label="Repo público o portfolio *">
-                      <input type="url" className={inputClass} placeholder="https://github.com/tu-usuario o https://tudominio.com" value={formData.repo} onChange={e => update('repo', e.target.value)} />
-                    </Field>
-                    <Field label="¿Cómo te enteraste de Deenex?">
-                      <Select name="como_te_enteraste" options={['Publicación de Alan en LinkedIn', 'Búsqueda en LinkedIn Jobs', 'Referido (decinos quién abajo)', 'Otra red social', 'Otra (decinos abajo)']} />
-                    </Field>
-                    <Field label="¿Algo más que quieras contar?" hint="Si te referenció alguien, decinos su nombre acá. O cualquier cosa relevante.">
-                      <textarea className={inputClass} rows="3" placeholder="Opcional" value={formData.notas_extra} onChange={e => update('notas_extra', e.target.value)} />
-                    </Field>
-                  </Block>
+                  {currentStepKey === 'origen' && (
+                    <>
+                      <StepHeader num="6" total="6" title="Origen y notas" subtitle="Última pantalla. Después confirmás y enviás." />
+                      <Field label="Repo público o portfolio *">
+                        <input type="url" className={inputClass} placeholder="https://github.com/tu-usuario o https://tudominio.com" value={formData.repo} onChange={e => update('repo', e.target.value)} />
+                      </Field>
+                      <Field label="¿Cómo te enteraste de Deenex?">
+                        <Select name="como_te_enteraste" options={['Publicación de Alan en LinkedIn', 'Búsqueda en LinkedIn Jobs', 'Referido (decinos quién abajo)', 'Otra red social', 'Otra (decinos abajo)']} />
+                      </Field>
+                      <Field label="¿Algo más que quieras contar?" hint="Si te referenció alguien, decinos su nombre acá">
+                        <textarea className={inputClass} rows="3" placeholder="Opcional" value={formData.notas_extra} onChange={e => update('notas_extra', e.target.value)} />
+                      </Field>
+                    </>
+                  )}
 
-                  <button type="submit" disabled={submitting}
-                    className="btn-primary w-full mt-6 py-4 bg-primary text-white font-heading font-bold text-base rounded-xl shadow-lg shadow-primary/20 disabled:opacity-60 disabled:cursor-not-allowed">
-                    {submitting ? 'Enviando...' : '⚡ ENVIAR APLICACIÓN'}
-                  </button>
-                </form>
+                </div>
+              )}
+
+              {/* Botones de navegación */}
+              {!success && (
+                <div className="flex gap-3 mt-8 pt-5 border-t border-border">
+                  {step > 0 && (
+                    <button type="button" onClick={prev} disabled={submitting}
+                      className="px-6 py-3 rounded-xl border border-border bg-white text-ink font-heading font-bold text-sm hover:bg-primary/5 transition-colors disabled:opacity-50">
+                      ← Atrás
+                    </button>
+                  )}
+                  <div className="flex-1" />
+                  {step < stepsMeta.length - 1 ? (
+                    <button type="button" onClick={next}
+                      className="btn-primary px-8 py-3 bg-primary text-white font-heading font-bold text-sm rounded-xl shadow-lg shadow-primary/20 transition-transform hover:scale-[1.02]">
+                      Siguiente →
+                    </button>
+                  ) : (
+                    <button type="button" onClick={handleSubmit} disabled={submitting}
+                      className="btn-primary px-8 py-3 bg-primary text-white font-heading font-bold text-sm rounded-xl shadow-lg shadow-primary/20 transition-transform hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed">
+                      {submitting ? 'Enviando...' : '⚡ Enviar aplicación'}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>

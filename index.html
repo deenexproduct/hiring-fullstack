@@ -27,6 +27,49 @@
   <meta name="twitter:image" content="https://deenexproduct.github.io/hiring-fullstack/og-image.png" />
   <meta name="twitter:image:alt" content="Deenex busca Full-Stack Engineer — USD 2.000, 100% remoto." />
 
+  <!-- Schema.org JobPosting (Google Jobs) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    "title": "Full-Stack Engineer (Pack de funcionalidades: POS + Delivery + Pagos + Frontend)",
+    "description": "<p>Deenex busca un Full-Stack Engineer para un pack de funcionalidades concretas que cubre 3 verticales backend (POS, Delivery, Pagos) más la capa frontend que las expone.</p><p><strong>Stack:</strong> React + TypeScript + Node.js (NestJS o Express) + MongoDB + Redis. BullMQ para colas, integraciones REST + Webhooks asincrónicos.</p><p><strong>Requisitos clave:</strong> 3+ años full-stack en producción, experiencia con microservicios y sistemas event-driven, integraciones reales con APIs externas (POS, payment gateways, delivery providers). Excluyente: uso DIARIO de Claude Code (CLI / IDE extension) en flujo de desarrollo.</p><p><strong>Compensación:</strong> USD 2.000 por el pack completo, modalidad por obra (no relación de dependencia). Si la obra funciona, escala a relación full-time o híbrido CABA con compensación senior LATAM en USD.</p><p><strong>100% remoto</strong>, CABA/GBA preferente. Entrevistas Lun 4 a Jue 7 de mayo, 30 min con Leandro Rebequi (CTO).</p>",
+    "datePosted": "2026-05-01",
+    "validThrough": "2026-05-15T23:59:00-03:00",
+    "employmentType": "CONTRACTOR",
+    "hiringOrganization": {
+      "@type": "Organization",
+      "name": "Deenex",
+      "sameAs": "https://deenex.com",
+      "logo": "https://deenexproduct.github.io/hiring-fullstack/og-image.png"
+    },
+    "jobLocationType": "TELECOMMUTE",
+    "applicantLocationRequirements": [
+      { "@type": "Country", "name": "Argentina" },
+      { "@type": "Country", "name": "Uruguay" },
+      { "@type": "Country", "name": "Chile" },
+      { "@type": "Country", "name": "Colombia" },
+      { "@type": "Country", "name": "México" }
+    ],
+    "baseSalary": {
+      "@type": "MonetaryAmount",
+      "currency": "USD",
+      "value": {
+        "@type": "QuantitativeValue",
+        "value": 2000,
+        "unitText": "PROJECT"
+      }
+    },
+    "directApply": true,
+    "url": "https://deenexproduct.github.io/hiring-fullstack/",
+    "industry": "Software / Gastronomic Tech",
+    "occupationalCategory": "15-1252.00 Software Developers",
+    "skills": "React, TypeScript, Node.js, NestJS, MongoDB, Redis, BullMQ, Microservices, REST APIs, Webhooks, Claude Code",
+    "qualifications": "3+ años full-stack en producción. Experiencia con microservicios, sistemas async (colas/eventos) e integraciones REST/Webhooks. Uso diario de Claude Code (excluyente).",
+    "responsibilities": "Construir el pack de funcionalidades (POS + Delivery + Pagos + Frontend) end-to-end. Integraciones con APIs externas. Diseño de microservicios desacoplados. Trabajo directo con el CTO."
+  }
+  </script>
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235423E7'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.35em' font-family='sans-serif' font-size='20' font-weight='bold' fill='white'%3ED%3C/text%3E%3C/svg%3E" />
 
@@ -949,28 +992,81 @@
       </div>
     );
 
+    const WIZARD_STORAGE_KEY = 'deenex-hiring-wizard-v1';
+    const EMPTY_FORM = {
+      nombre: '', email: '', whatsapp: '', linkedin: '', ubicacion: '',
+      trabajando_actualmente: '', startup_previa: '', startup_detalle: '',
+      anios_exp_total: '',
+      anios_react_ts: '', anios_node: '', anios_mongodb: '', anios_redis_queues: '',
+      exp_microservicios: '', caso_microservicios: '',
+      exp_async: '', caso_async: '',
+      exp_integraciones: '', caso_integraciones: '',
+      claude_code_diario: '', claude_code_como: '',
+      repo: '', cuando_arranca: '', horas_semana: '', pretension_fulltime: '',
+      como_te_enteraste: '', notas_extra: ''
+    };
+
+    function loadWizardDraft() {
+      try {
+        const raw = localStorage.getItem(WIZARD_STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+        if (Date.now() - (parsed.savedAt || 0) > 1000 * 60 * 60 * 24 * 14) return null;
+        return parsed;
+      } catch { return null; }
+    }
+
     function ApplicationModal({ isOpen, onClose }) {
       const [step, setStep] = useState(0);
       const [direction, setDirection] = useState('forward');
-      const [formData, setFormData] = useState({
-        nombre: '', email: '', whatsapp: '', linkedin: '', ubicacion: '',
-        trabajando_actualmente: '', startup_previa: '', startup_detalle: '',
-        anios_exp_total: '',
-        anios_react_ts: '', anios_node: '', anios_mongodb: '', anios_redis_queues: '',
-        exp_microservicios: '', caso_microservicios: '',
-        exp_async: '', caso_async: '',
-        exp_integraciones: '', caso_integraciones: '',
-        claude_code_diario: '', claude_code_como: '',
-        repo: '', cuando_arranca: '', horas_semana: '', pretension_fulltime: '',
-        como_te_enteraste: '', notas_extra: ''
-      });
+      const [formData, setFormData] = useState({ ...EMPTY_FORM });
       const [submitting, setSubmitting] = useState(false);
       const [success, setSuccess] = useState(false);
       const [error, setError] = useState('');
+      const [draftRestored, setDraftRestored] = useState(false);
+      const [draftLoaded, setDraftLoaded] = useState(false);
 
       const update = (k, v) => setFormData(p => ({ ...p, [k]: v }));
 
-      // Reset al cerrar (para que la próxima apertura sea fresh)
+      // Cargar borrador cuando el modal se abre por primera vez
+      useEffect(() => {
+        if (!isOpen || draftLoaded) return;
+        const draft = loadWizardDraft();
+        if (draft && draft.formData) {
+          setFormData({ ...EMPTY_FORM, ...draft.formData });
+          if (Number.isInteger(draft.step)) setStep(draft.step);
+          setDraftRestored(true);
+        }
+        setDraftLoaded(true);
+      }, [isOpen, draftLoaded]);
+
+      // Persistir borrador en cada cambio
+      useEffect(() => {
+        if (success || !draftLoaded) return;
+        const hasContent = Object.values(formData).some(v => typeof v === 'string' && v.trim().length > 0);
+        if (!hasContent && step === 0) return;
+        try {
+          localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify({ formData, step, savedAt: Date.now() }));
+        } catch {}
+      }, [formData, step, success, draftLoaded]);
+
+      // Limpiar al enviar con éxito
+      useEffect(() => {
+        if (success) {
+          try { localStorage.removeItem(WIZARD_STORAGE_KEY); } catch {}
+        }
+      }, [success]);
+
+      const discardDraft = () => {
+        try { localStorage.removeItem(WIZARD_STORAGE_KEY); } catch {}
+        setFormData({ ...EMPTY_FORM });
+        setStep(0);
+        setError('');
+        setDraftRestored(false);
+      };
+
+      // Reset al cerrar (para que la próxima apertura sea fresh tras éxito)
       useEffect(() => {
         if (!isOpen) {
           setTimeout(() => {
@@ -978,6 +1074,7 @@
               setSuccess(false);
               setStep(0);
               setError('');
+              setFormData({ ...EMPTY_FORM });
             }
           }, 300);
         }
@@ -1112,6 +1209,21 @@
                 </div>
               ) : (
                 <div className="space-y-5" key={`step-${step}`} style={{ animation: `${direction === 'forward' ? 'slideInRight' : 'slideInLeft'} 0.3s ease-out` }}>
+                  {draftRestored && (
+                    <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+                      <div className="flex items-start gap-3">
+                        <span className="text-base mt-0.5">💾</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-ink text-sm font-heading font-semibold mb-0.5">Recuperamos tu borrador</p>
+                          <p className="text-ink-2 text-xs font-sans leading-relaxed">Continuá donde lo dejaste. Si preferís empezar de cero, descartalo.</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 justify-end mt-2">
+                        <button type="button" onClick={() => setDraftRestored(false)} className="text-xs font-sans text-ink-3 hover:text-ink px-3 py-1.5 rounded-lg hover:bg-primary/5">Continuar</button>
+                        <button type="button" onClick={discardDraft} className="text-xs font-sans text-primary hover:underline font-semibold px-3 py-1.5 rounded-lg hover:bg-primary/10">Empezar de cero</button>
+                      </div>
+                    </div>
+                  )}
                   {error && <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-sans">{error}</div>}
 
                   {currentStepKey === 'datos' && (

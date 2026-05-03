@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    width: 1200px;
+    height: 630px;
+    background: linear-gradient(135deg, #5423E7 0%, #3a15b0 50%, #2a0f8a 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0);
+    background-size: 32px 32px;
+  }
+  body::after {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(196,181,253,0.25), transparent 70%);
+    filter: blur(40px);
+  }
+  .wrap {
+    position: relative;
+    z-index: 2;
+    padding: 70px 80px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 14px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: white;
+  }
+  .badge .dot {
+    width: 9px; height: 9px;
+    background: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #4ade80;
+  }
+  .deenex {
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 18px;
+    letter-spacing: 8px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.55);
+  }
+  .middle { margin-top: 30px; }
+  .label {
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 14px;
+    letter-spacing: 6px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 96px;
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -3px;
+    margin-bottom: 22px;
+  }
+  h1 .italic {
+    font-style: italic;
+    font-weight: 500;
+    color: #c4b5fd;
+  }
+  .sub {
+    font-size: 30px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.92);
+    line-height: 1.25;
+    max-width: 920px;
+  }
+  .bottom {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+  }
+  .stat .val {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .stat .sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .divider {
+    width: 1px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="badge"><span class="dot"></span>POSICIÓN ABIERTA</div>
+      <div class="deenex">DEENEX</div>
+    </div>
+
+    <div class="middle">
+      <div class="label">SE BUSCA</div>
+      <h1>Full-Stack <span class="italic">Engineer</span></h1>
+      <div class="sub">Pack de funcionalidades: POS + Delivery + Pagos + Frontend</div>
+    </div>
+
+    <div class="bottom">
+      <div class="stat">
+        <div class="val">USD 2.000</div>
+        <div class="sub">Pack completo</div>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <div class="val">100% Remoto</div>
+        <div class="sub">CABA/GBA preferente</div>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <div class="val">React + Node</div>
+        <div class="sub">MongoDB + Redis</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

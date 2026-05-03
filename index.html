@@ -914,6 +914,37 @@
     ============================================================ */
     const FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbyyzsnjrL7Thiou73B3U3gnEN2jTKDubs-85SV12TO3bUAGUbl-y50W3YaNgegLygpA/exec";
 
+    const Field = ({ label, hint, children }) => (
+      <div>
+        <label className="block font-heading font-semibold text-ink text-sm mb-1.5">{label}</label>
+        {hint && <p className="text-ink-3 text-xs font-sans -mt-1 mb-2">{hint}</p>}
+        {children}
+      </div>
+    );
+    const RadioGroup = ({ value, onChange, options }) => (
+      <div className="flex flex-wrap gap-2.5">
+        {options.map(opt => (
+          <button type="button" key={opt}
+            className={`px-4 py-2.5 rounded-xl border text-sm font-sans cursor-pointer transition-all ${value === opt ? 'bg-primary text-white border-primary shadow-md shadow-primary/20' : 'bg-white text-ink-2 border-border hover:border-primary/40 hover:bg-primary/5'}`}
+            onClick={() => onChange(opt)}>{opt}</button>
+        ))}
+      </div>
+    );
+    const SelectField = ({ value, onChange, options }) => (
+      <select className="w-full px-4 py-3 rounded-xl border border-border bg-white text-ink text-sm font-sans focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        value={value} onChange={e => onChange(e.target.value)}>
+        <option value="">Seleccionar...</option>
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    );
+    const StepHeader = ({ num, total, title, subtitle }) => (
+      <div className="mb-6">
+        <p className="text-primary text-xs font-mono uppercase tracking-widest mb-1.5">Paso {num} de {total}</p>
+        <h4 className="font-heading font-extrabold text-ink text-2xl tracking-tight mb-1">{title}</h4>
+        {subtitle && <p className="text-ink-2 text-sm font-sans">{subtitle}</p>}
+      </div>
+    );
+
     function ApplicationModal({ isOpen, onClose }) {
       const [step, setStep] = useState(0);
       const [direction, setDirection] = useState('forward');
@@ -1032,34 +1063,7 @@
       const radioGroupClass = "flex flex-wrap gap-2.5";
       const radioClass = (selected) => `px-4 py-2.5 rounded-xl border text-sm font-sans cursor-pointer transition-all ${selected ? 'bg-primary text-white border-primary shadow-md shadow-primary/20' : 'bg-white text-ink-2 border-border hover:border-primary/40 hover:bg-primary/5'}`;
 
-      const Field = ({ label, hint, children }) => (
-        <div>
-          <label className={labelClass}>{label}</label>
-          {hint && <p className="text-ink-3 text-xs font-sans -mt-1 mb-2">{hint}</p>}
-          {children}
-        </div>
-      );
-      const RadioGroup = ({ name, options }) => (
-        <div className={radioGroupClass}>
-          {options.map(opt => (
-            <button type="button" key={opt} className={radioClass(formData[name] === opt)} onClick={() => update(name, opt)}>{opt}</button>
-          ))}
-        </div>
-      );
-      const Select = ({ name, options }) => (
-        <select className={inputClass} value={formData[name]} onChange={e => update(name, e.target.value)}>
-          <option value="">Seleccionar...</option>
-          {options.map(o => <option key={o} value={o}>{o}</option>)}
-        </select>
-      );
 
-      const StepHeader = ({ num, total, title, subtitle }) => (
-        <div className="mb-6">
-          <p className="text-primary text-xs font-mono uppercase tracking-widest mb-1.5">Paso {num} de {total}</p>
-          <h4 className="font-heading font-extrabold text-ink text-2xl tracking-tight mb-1">{title}</h4>
-          {subtitle && <p className="text-ink-2 text-sm font-sans">{subtitle}</p>}
-        </div>
-      );
 
       const stepKeys = stepsMeta.map(s => s.key);
       const currentStepKey = stepKeys[step];
@@ -1110,7 +1114,7 @@
                     <>
                       <StepHeader num="1" total="6" title="Datos básicos" subtitle="Para poder contactarte si calificás" />
                       <Field label="Nombre completo *">
-                        <input type="text" className={inputClass} placeholder="Tu nombre completo" value={formData.nombre} onChange={e => update('nombre', e.target.value)} autoFocus />
+                        <input type="text" className={inputClass} placeholder="Tu nombre completo" value={formData.nombre} onChange={e => update('nombre', e.target.value)} />
                       </Field>
                       <Field label="Email *">
                         <input type="email" className={inputClass} placeholder="tu@email.com" value={formData.email} onChange={e => update('email', e.target.value)} />
@@ -1122,7 +1126,7 @@
                         <input type="url" className={inputClass} placeholder="https://linkedin.com/in/tu-usuario" value={formData.linkedin} onChange={e => update('linkedin', e.target.value)} />
                       </Field>
                       <Field label="¿Vivís en CABA o GBA? *">
-                        <RadioGroup name="ubicacion" options={['Sí, CABA', 'Sí, GBA', 'No, vivo en otra ciudad']} />
+                        <RadioGroup value={formData.ubicacion} onChange={v => update("ubicacion", v)} options={['Sí, CABA', 'Sí, GBA', 'No, vivo en otra ciudad']} />
                       </Field>
                     </>
                   )}
@@ -1131,16 +1135,16 @@
                     <>
                       <StepHeader num="2" total="6" title="Experiencia general" subtitle="Para entender de dónde venís" />
                       <Field label="¿Estás trabajando actualmente? *">
-                        <RadioGroup name="trabajando_actualmente" options={['Sí, full-time', 'Sí, freelance / por proyecto', 'No, estoy buscando']} />
+                        <RadioGroup value={formData.trabajando_actualmente} onChange={v => update("trabajando_actualmente", v)} options={['Sí, full-time', 'Sí, freelance / por proyecto', 'No, estoy buscando']} />
                       </Field>
                       <Field label="¿Trabajaste en startup antes? *">
-                        <RadioGroup name="startup_previa" options={['Sí', 'No']} />
+                        <RadioGroup value={formData.startup_previa} onChange={v => update("startup_previa", v)} options={['Sí', 'No']} />
                         {formData.startup_previa === 'Sí' && (
                           <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos cuál(es) y qué hacías ahí (1-2 líneas)" value={formData.startup_detalle} onChange={e => update('startup_detalle', e.target.value)} />
                         )}
                       </Field>
                       <Field label="Años de experiencia full-stack *">
-                        <Select name="anios_exp_total" options={['Menos de 1', '1-2', '3-4', '5-7', '8+']} />
+                        <SelectField value={formData.anios_exp_total} onChange={v => update("anios_exp_total", v)} options={['Menos de 1', '1-2', '3-4', '5-7', '8+']} />
                       </Field>
                     </>
                   )}
@@ -1150,32 +1154,32 @@
                       <StepHeader num="3" total="6" title="Stack técnico" subtitle="Lo más importante para nosotros" />
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label="Años con React + TypeScript *">
-                          <Select name="anios_react_ts" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                          <SelectField value={formData.anios_react_ts} onChange={v => update("anios_react_ts", v)} options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
                         </Field>
                         <Field label="Años con Node.js *">
-                          <Select name="anios_node" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                          <SelectField value={formData.anios_node} onChange={v => update("anios_node", v)} options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
                         </Field>
                         <Field label="Años con MongoDB *">
-                          <Select name="anios_mongodb" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                          <SelectField value={formData.anios_mongodb} onChange={v => update("anios_mongodb", v)} options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
                         </Field>
                         <Field label="Años con Redis / queues">
-                          <Select name="anios_redis_queues" options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
+                          <SelectField value={formData.anios_redis_queues} onChange={v => update("anios_redis_queues", v)} options={['0', 'Menos de 1', '1-2', '3-4', '5+']} />
                         </Field>
                       </div>
                       <Field label="¿Trabajaste con microservicios? *">
-                        <RadioGroup name="exp_microservicios" options={['Sí, varios', 'Sí, uno', 'No']} />
+                        <RadioGroup value={formData.exp_microservicios} onChange={v => update("exp_microservicios", v)} options={['Sí, varios', 'Sí, uno', 'No']} />
                         {(formData.exp_microservicios === 'Sí, varios' || formData.exp_microservicios === 'Sí, uno') && (
                           <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Contanos cómo estaban estructurados y qué resolvías" value={formData.caso_microservicios} onChange={e => update('caso_microservicios', e.target.value)} />
                         )}
                       </Field>
                       <Field label="¿Trabajaste con sistemas async / event-driven? *">
-                        <RadioGroup name="exp_async" options={['Sí, en producción', 'Sí, en proyectos personales', 'No']} />
+                        <RadioGroup value={formData.exp_async} onChange={v => update("exp_async", v)} options={['Sí, en producción', 'Sí, en proyectos personales', 'No']} />
                         {formData.exp_async.startsWith('Sí') && (
                           <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Qué stack (BullMQ, RabbitMQ, Kafka, etc.) y qué problema resolvías" value={formData.caso_async} onChange={e => update('caso_async', e.target.value)} />
                         )}
                       </Field>
                       <Field label="¿Integraste un POS, gateway de pago o proveedor de delivery? *">
-                        <RadioGroup name="exp_integraciones" options={['Sí, varios', 'Sí, uno', 'No nunca']} />
+                        <RadioGroup value={formData.exp_integraciones} onChange={v => update("exp_integraciones", v)} options={['Sí, varios', 'Sí, uno', 'No nunca']} />
                         {formData.exp_integraciones.startsWith('Sí') && (
                           <textarea className={`${inputClass} mt-3`} rows="2" placeholder="Cuál (Mercado Pago / Fudo / PedidosYa / etc.) y qué fue lo más complicado" value={formData.caso_integraciones} onChange={e => update('caso_integraciones', e.target.value)} />
                         )}
@@ -1192,7 +1196,7 @@
                         </p>
                       </div>
                       <Field label="¿Usás Claude Code (CLI / IDE de Anthropic) DIARIO? *">
-                        <RadioGroup name="claude_code_diario" options={['Sí, todos los días', 'Lo uso pero no diario', 'No']} />
+                        <RadioGroup value={formData.claude_code_diario} onChange={v => update("claude_code_diario", v)} options={['Sí, todos los días', 'Lo uso pero no diario', 'No']} />
                         {formData.claude_code_diario === 'Sí, todos los días' && (
                           <textarea className={`${inputClass} mt-3`} rows="4" placeholder="Contanos cómo lo integrás (CLAUDE.md, hooks, MCPs custom, comandos slash habituales, agents armados)" value={formData.claude_code_como} onChange={e => update('claude_code_como', e.target.value)} />
                         )}
@@ -1204,10 +1208,10 @@
                     <>
                       <StepHeader num="5" total="6" title="Disponibilidad y compensación" subtitle="Para cerrar números antes de la entrevista" />
                       <Field label="¿Cuándo podés arrancar? *">
-                        <RadioGroup name="cuando_arranca" options={['Esta semana', 'Próxima semana', 'En 2 semanas', '1 mes o más']} />
+                        <RadioGroup value={formData.cuando_arranca} onChange={v => update("cuando_arranca", v)} options={['Esta semana', 'Próxima semana', 'En 2 semanas', '1 mes o más']} />
                       </Field>
                       <Field label="Horas semanales que podés dedicar al pack *">
-                        <Select name="horas_semana" options={['Menos de 15 hs/sem', '15-25 hs/sem', '25-40 hs/sem', 'Full-time (40+)']} />
+                        <SelectField value={formData.horas_semana} onChange={v => update("horas_semana", v)} options={['Menos de 15 hs/sem', '15-25 hs/sem', '25-40 hs/sem', 'Full-time (40+)']} />
                       </Field>
                       <Field label="Pretensión salarial mensual en USD si esto escala a full-time" hint="Opcional. Nos ayuda a alinear expectativas">
                         <input type="text" className={inputClass} placeholder="Ej: USD 3.500 / mes" value={formData.pretension_fulltime} onChange={e => update('pretension_fulltime', e.target.value)} />
@@ -1222,7 +1226,7 @@
                         <input type="url" className={inputClass} placeholder="https://github.com/tu-usuario o https://tudominio.com" value={formData.repo} onChange={e => update('repo', e.target.value)} />
                       </Field>
                       <Field label="¿Cómo te enteraste de Deenex?">
-                        <Select name="como_te_enteraste" options={['Publicación de Alan en LinkedIn', 'Búsqueda en LinkedIn Jobs', 'Referido (decinos quién abajo)', 'Otra red social', 'Otra (decinos abajo)']} />
+                        <SelectField value={formData.como_te_enteraste} onChange={v => update("como_te_enteraste", v)} options={['Publicación de Alan en LinkedIn', 'Búsqueda en LinkedIn Jobs', 'Referido (decinos quién abajo)', 'Otra red social', 'Otra (decinos abajo)']} />
                       </Field>
                       <Field label="¿Algo más que quieras contar?" hint="Si te referenció alguien, decinos su nombre acá">
                         <textarea className={inputClass} rows="3" placeholder="Opcional" value={formData.notas_extra} onChange={e => update('notas_extra', e.target.value)} />
